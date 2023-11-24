@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class DoGatherBackendApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(DoGatherBackendApplication.class, args);
-	}
-
+  public static void main(String[] args) {
+    SpringApplication.run(DoGatherBackendApplication.class, args);
+  }
 }
