@@ -1,6 +1,8 @@
 package com.bytd.dogatherbackend.core.tasklist;
 
+import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskDbDto;
 import java.util.UUID;
+import java.util.function.Supplier;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
@@ -29,13 +31,16 @@ public class Task {
   boolean isIdConflict(UUID id) {
     return this.id.equals(id);
   }
-}
 
-enum TaskState {
-  NEW,
-  IN_PROGRESS,
-  DONE,
-
-  CANCELLED,
-  REOPENED
+  TaskDbDto toDbDto(Supplier<TaskDbDto> dtoSupplier) {
+    var dto = dtoSupplier.get();
+    dto.setId(id);
+    dto.setState(state);
+    dto.setProgressTotal(progressTotal);
+    dto.setTimeSpent(timeSpent);
+    dto.setName(name);
+    dto.setDescription(description);
+    dto.setTaskListId(taskListId);
+    return dto;
+  }
 }

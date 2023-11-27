@@ -1,8 +1,11 @@
 package com.bytd.dogatherbackend.core.tasklist;
 
+import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskDbDto;
+import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskListDbDto;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 class TaskList {
 
@@ -44,6 +47,18 @@ class TaskList {
       participants.add(new Participant(participantId, roles));
     }
   }
+
+  TaskListDbDto toDbDto(
+      Supplier<TaskListDbDto> listDbDtoSupplier, Supplier<TaskDbDto> taskDbDtoSupplier) {
+    var dto = listDbDtoSupplier.get();
+    dto.setId(id);
+    dto.setName(name);
+    dto.setDescription(description);
+    dto.setCreatorId(creatorId);
+    dto.setParticipants(participants);
+    dto.setTasks(tasks.stream().map(task -> task.toDbDto(taskDbDtoSupplier)).toList());
+    return dto;
+  }
 }
 
 enum Role {
@@ -51,5 +66,3 @@ enum Role {
   EDITOR,
   GUEST
 }
-
-record Participant(UUID participantId, List<Role> roles) {}
