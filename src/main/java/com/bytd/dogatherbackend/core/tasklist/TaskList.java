@@ -40,11 +40,11 @@ class TaskList {
     }
   }
 
-  void addParticipant(UUID participantId, List<Role> roles) {
-    if (participants.stream().anyMatch(p -> p.participantId().equals(participantId))) {
+  void addParticipant(AddParticipantDto dto) {
+    if (participants.stream().anyMatch(p -> p.participantId().equals(dto.participantId()))) {
       throw new IllegalArgumentException("Participant already exists in the list");
     } else {
-      participants.add(new Participant(participantId, roles));
+      participants.add(new Participant(dto.participantId(), dto.roles()));
     }
   }
 

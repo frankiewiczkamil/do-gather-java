@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 class TaskListTest {
   UUID taskListId = UUID.randomUUID();
+  UUID creatorId = UUID.randomUUID();
   CreateTaskListDto createTaskListDto =
       new CreateTaskListDto(taskListId, "name", "description", UUID.randomUUID());
 
@@ -70,9 +71,16 @@ class TaskListTest {
   void shouldAddParticipantsToTheListWithoutExceptionWhenPayloadIsValid() {
     var taskList = TaskList.create(createTaskListDto);
 
-    assertDoesNotThrow(() -> taskList.addParticipant(UUID.randomUUID(), List.of(Role.OWNER)));
-    assertDoesNotThrow(() -> taskList.addParticipant(UUID.randomUUID(), List.of(Role.GUEST)));
-    assertDoesNotThrow(() -> taskList.addParticipant(UUID.randomUUID(), List.of(Role.EDITOR)));
+    var addGuestParticipantDto =
+        new AddParticipantDto(UUID.randomUUID(), List.of(Role.GUEST), creatorId);
+    var addEditorParticipantDto =
+        new AddParticipantDto(UUID.randomUUID(), List.of(Role.EDITOR), creatorId);
+    var addOwnerParticipantDto =
+        new AddParticipantDto(UUID.randomUUID(), List.of(Role.OWNER), creatorId);
+
+    assertDoesNotThrow(() -> taskList.addParticipant(addGuestParticipantDto));
+    assertDoesNotThrow(() -> taskList.addParticipant(addEditorParticipantDto));
+    assertDoesNotThrow(() -> taskList.addParticipant(addOwnerParticipantDto));
   }
 
   @Test
@@ -80,8 +88,9 @@ class TaskListTest {
     var taskList = TaskList.create(createTaskListDto);
     var id = UUID.randomUUID();
     var expectedParticipant = new Participant(id, List.of(Role.OWNER));
+    var addParticipantDto = new AddParticipantDto(id, List.of(Role.OWNER), creatorId);
 
-    taskList.addParticipant(id, List.of(Role.OWNER));
+    taskList.addParticipant(addParticipantDto);
 
     var taskListDbDto = taskList.toDbDto(TaskListDbDtoImpl::new, TaskDbDtoImpl::new);
     assertEquals(2, taskListDbDto.getParticipants().size());
