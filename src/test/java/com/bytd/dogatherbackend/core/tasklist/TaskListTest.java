@@ -65,4 +65,26 @@ class TaskListTest {
     taskList.addTask(createTaskDto);
     assertThrows(IllegalArgumentException.class, () -> taskList.addTask(createTaskDto));
   }
+
+  @Test
+  void shouldAddParticipantsToTheListWithoutExceptionWhenPayloadIsValid() {
+    var taskList = TaskList.create(createTaskListDto);
+
+    assertDoesNotThrow(() -> taskList.addParticipant(UUID.randomUUID(), List.of(Role.OWNER)));
+    assertDoesNotThrow(() -> taskList.addParticipant(UUID.randomUUID(), List.of(Role.GUEST)));
+    assertDoesNotThrow(() -> taskList.addParticipant(UUID.randomUUID(), List.of(Role.EDITOR)));
+  }
+
+  @Test
+  void shouldAddParticipantToTheList() {
+    var taskList = TaskList.create(createTaskListDto);
+    var id = UUID.randomUUID();
+    var expectedParticipant = new Participant(id, List.of(Role.OWNER));
+
+    taskList.addParticipant(id, List.of(Role.OWNER));
+
+    var taskListDbDto = taskList.toDbDto(TaskListDbDtoImpl::new, TaskDbDtoImpl::new);
+    assertEquals(2, taskListDbDto.getParticipants().size());
+    assertEquals(expectedParticipant, taskListDbDto.getParticipants().get(1));
+  }
 }
