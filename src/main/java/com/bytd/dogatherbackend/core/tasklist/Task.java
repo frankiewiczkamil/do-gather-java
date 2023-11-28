@@ -32,7 +32,7 @@ public class Task {
     return this.id.equals(id);
   }
 
-  TaskDbDto toDbDto(Supplier<TaskDbDto> dtoSupplier) {
+  public TaskDbDto toDbDto(Supplier<TaskDbDto> dtoSupplier) {
     var dto = dtoSupplier.get();
     dto.setId(id);
     dto.setState(state);

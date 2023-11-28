@@ -1,8 +1,11 @@
 package com.bytd.dogatherbackend.core.tasklist;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
+import com.bytd.dogatherbackend.core.tasklist.infra.db.impl.TaskDbDtoImpl;
+import com.bytd.dogatherbackend.core.tasklist.infra.db.impl.TaskListDbDtoImpl;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -12,18 +15,46 @@ class TaskListTest {
       new CreateTaskListDto(taskListId, "name", "description", UUID.randomUUID());
 
   @Test
-  void shouldCreateTaskListInstance() {
+  void shouldRunCreateTaskListInstanceWithoutExceptionWhenPayloadIsValid() {
     assertDoesNotThrow(() -> TaskList.create(createTaskListDto));
   }
 
   @Test
-  void shouldAllowAddingTasksToTheList() {
+  void shouldCreateTaskListWithValidState() {
+    var taskList = TaskList.create(createTaskListDto);
+    var taskListDbDto = taskList.toDbDto(TaskListDbDtoImpl::new, TaskDbDtoImpl::new);
+    assertEquals(taskListId, taskListDbDto.getId());
+    assertEquals("name", taskListDbDto.getName());
+    assertEquals("description", taskListDbDto.getDescription());
+  }
+
+  @Test
+  void shouldAddTasksToTheListWithoutExceptionWhenPayloadIsValid() {
     var taskList = TaskList.create(createTaskListDto);
     var task1 = new CreateTaskDto(UUID.randomUUID(), "name", "description");
     var task2 = new CreateTaskDto(UUID.randomUUID(), "name", "description");
 
     assertDoesNotThrow(() -> taskList.addTask(task1));
     assertDoesNotThrow(() -> taskList.addTask(task2));
+  }
+
+  @Test
+  void shouldAddTasksToTheList() {
+    var taskList = TaskList.create(createTaskListDto);
+    var task1 = new CreateTaskDto(UUID.randomUUID(), "name", "description");
+    var task2 = new CreateTaskDto(UUID.randomUUID(), "name", "description");
+
+    taskList.addTask(task1);
+    taskList.addTask(task2);
+
+    var taskListDbDto = taskList.toDbDto(TaskListDbDtoImpl::new, TaskDbDtoImpl::new);
+
+    assertEquals(2, taskListDbDto.getTasks().size());
+
+    var taskDbDto1 = taskListDbDto.getTasks().get(0);
+    var taskDbDto2 = taskListDbDto.getTasks().get(1);
+
+    assertThat(taskListDbDto.getTasks()).isEqualTo(List.of(taskDbDto1, taskDbDto2));
   }
 
   @Test
