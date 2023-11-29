@@ -1,10 +1,12 @@
 package com.bytd.dogatherbackend.core.tasklist;
 
+import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.AuthorIsNotAParticipant;
+import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.GuestNotAllowedToAddAnotherParticipant;
+import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.ParticipantAlreadyAdded;
+import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.ParticipantRoleTooLowToAddAnotherParticipant;
 import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskDbDto;
 import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskListDbDto;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
 
 class TaskList {
@@ -41,11 +43,37 @@ class TaskList {
   }
 
   void addParticipant(AddParticipantDto dto) {
-    if (participants.stream().anyMatch(p -> p.participantId().equals(dto.participantId()))) {
-      throw new IllegalArgumentException("Participant already exists in the list");
+    var author = getParticipant(dto.authorId());
+    if (author.isEmpty()) {
+      throw new AuthorIsNotAParticipant(dto.authorId());
+    } else if (participants.stream().anyMatch(p -> p.participantId().equals(dto.participantId()))) {
+      throw new ParticipantAlreadyAdded(dto.participantId());
+    } else if (author.get().roles().stream().noneMatch(Role::isEditorOrOwner)) {
+      throw new GuestNotAllowedToAddAnotherParticipant(dto.authorId());
+    } else if (isRoleToBeAddedHigherThanAuthorRole(dto)) {
+      throw new ParticipantRoleTooLowToAddAnotherParticipant(getRolesString(author.get()));
     } else {
       participants.add(new Participant(dto.participantId(), dto.roles()));
     }
+  }
+
+  private boolean isRoleToBeAddedHigherThanAuthorRole(AddParticipantDto dto) {
+    var maybeAuthor = getParticipant(dto.authorId());
+    if (maybeAuthor.isEmpty()) {
+      throw new AuthorIsNotAParticipant(dto.authorId());
+    }
+    var authorRoles = maybeAuthor.get().roles();
+    var authorHighestRole = Role.findHighestRole(authorRoles);
+    var roleToBeAddedHighestRole = Role.findHighestRole(dto.roles());
+    return roleToBeAddedHighestRole.compareTo(authorHighestRole) > 0;
+  }
+
+  private Optional<Participant> getParticipant(UUID participantId) {
+    return participants.stream().filter(p -> p.participantId().equals(participantId)).findFirst();
+  }
+
+  private String getRolesString(Participant p) {
+    return p.roles().stream().toList().toString();
   }
 
   TaskListDbDto toDbDto(
@@ -61,8 +89,25 @@ class TaskList {
   }
 }
 
-enum Role {
-  OWNER,
+enum Role implements Comparable<Role> {
+  GUEST,
   EDITOR,
-  GUEST
+  OWNER;
+  private static final Comparator<Role> comparator = new RoleComparator();
+
+  boolean isEditorOrOwner() {
+    return this.equals(EDITOR) || this.equals(OWNER);
+  }
+
+  static Role findHighestRole(List<Role> roles) {
+    var max = roles.stream().max(comparator);
+    return max.orElseThrow(() -> new IllegalStateException("Roles list is empty"));
+  }
+
+  static class RoleComparator implements Comparator<Role> {
+    @Override
+    public int compare(Role o1, Role o2) {
+      return o1.compareTo(o2);
+    }
+  }
 }
