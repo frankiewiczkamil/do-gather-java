@@ -1,6 +1,6 @@
 package com.bytd.dogatherbackend.core.tasklist;
 
-import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskDbDto;
+import com.bytd.dogatherbackend.core.tasklist.app.TaskDbDto;
 import java.util.UUID;
 import java.util.function.Supplier;
 import lombok.NoArgsConstructor;
@@ -16,15 +16,27 @@ public class Task {
   private String description;
   private UUID taskListId;
 
-  public static Task create(CreateTaskDto dto, UUID taskListId) {
+  public static Task create(CreateTaskDto dto) {
     var instance = new Task();
     instance.id = dto.id();
     instance.name = dto.name();
     instance.description = dto.description();
-    instance.taskListId = taskListId;
+    instance.taskListId = dto.taskListId();
     instance.state = TaskState.NEW;
     instance.progressTotal = 0;
     instance.timeSpent = 0;
+    return instance;
+  }
+
+  public static Task fromDbDto(TaskDbDto dto) {
+    var instance = new Task();
+    instance.id = dto.getId();
+    instance.name = dto.getName();
+    instance.description = dto.getDescription();
+    instance.taskListId = dto.getTaskListId();
+    instance.state = dto.getState();
+    instance.progressTotal = dto.getProgressTotal();
+    instance.timeSpent = dto.getTimeSpent();
     return instance;
   }
 

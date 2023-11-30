@@ -1,15 +1,15 @@
 package com.bytd.dogatherbackend.core.tasklist;
 
+import com.bytd.dogatherbackend.core.tasklist.app.TaskDbDto;
+import com.bytd.dogatherbackend.core.tasklist.app.TaskListDbDto;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.AuthorIsNotAParticipant;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.GuestNotAllowedToAddAnotherParticipant;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.ParticipantAlreadyAdded;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.ParticipantRoleTooLowToAddAnotherParticipant;
-import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskDbDto;
-import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskListDbDto;
 import java.util.*;
 import java.util.function.Supplier;
 
-class TaskList {
+public class TaskList {
 
   private UUID id;
   private String name;
@@ -18,7 +18,7 @@ class TaskList {
   private List<Task> tasks;
   private UUID creatorId;
 
-  static TaskList create(CreateTaskListDto dto) {
+  public static TaskList create(CreateTaskListDto dto) {
     var instance = new TaskList();
     instance.id = dto.id();
     instance.name = dto.name();
@@ -33,16 +33,17 @@ class TaskList {
     return instance;
   }
 
-  void addTask(CreateTaskDto taskDto) {
+  public void addTask(CreateTaskDto taskDto) {
     if (tasks.stream().anyMatch(t -> t.isIdConflict(taskDto.id()))) {
       throw new IllegalArgumentException("Task already exists in the list");
     } else {
-      Task task = Task.create(taskDto, id);
+      Task task = Task.create(taskDto);
+      tasks = new LinkedList<>(tasks);
       tasks.add(task);
     }
   }
 
-  void addParticipant(AddParticipantDto dto) {
+  public void addParticipant(AddParticipantDto dto) {
     var author = getParticipant(dto.authorId());
     if (author.isEmpty()) {
       throw new AuthorIsNotAParticipant(dto.authorId());
@@ -76,7 +77,7 @@ class TaskList {
     return p.roles().stream().toList().toString();
   }
 
-  TaskListDbDto toDbDto(
+  public TaskListDbDto toDbDto(
       Supplier<TaskListDbDto> listDbDtoSupplier, Supplier<TaskDbDto> taskDbDtoSupplier) {
     var dto = listDbDtoSupplier.get();
     dto.setId(id);
@@ -87,27 +88,15 @@ class TaskList {
     dto.setTasks(tasks.stream().map(task -> task.toDbDto(taskDbDtoSupplier)).toList());
     return dto;
   }
-}
 
-enum Role implements Comparable<Role> {
-  GUEST,
-  EDITOR,
-  OWNER;
-  private static final Comparator<Role> comparator = new RoleComparator();
-
-  boolean isEditorOrOwner() {
-    return this.equals(EDITOR) || this.equals(OWNER);
-  }
-
-  static Role findHighestRole(List<Role> roles) {
-    var max = roles.stream().max(comparator);
-    return max.orElseThrow(() -> new IllegalStateException("Roles list is empty"));
-  }
-
-  static class RoleComparator implements Comparator<Role> {
-    @Override
-    public int compare(Role o1, Role o2) {
-      return o1.compareTo(o2);
-    }
+  public static TaskList fromDbDto(TaskListDbDto dto) {
+    var instance = new TaskList();
+    instance.id = dto.getId();
+    instance.name = dto.getName();
+    instance.description = dto.getDescription();
+    instance.creatorId = dto.getCreatorId();
+    instance.participants = dto.getParticipants();
+    instance.tasks = dto.getTasks().stream().map(Task::fromDbDto).toList();
+    return instance;
   }
 }

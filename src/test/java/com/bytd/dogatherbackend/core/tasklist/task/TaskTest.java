@@ -13,14 +13,14 @@ class TaskTest {
 
   @Test
   void shouldCreateTaskInstanceWithoutThrowingIfPayloadIsValid() {
-    var dto = new CreateTaskDto(UUID.randomUUID(), "name", "description");
-    assertDoesNotThrow(() -> Task.create(dto, UUID.randomUUID()));
+    var dto = new CreateTaskDto(UUID.randomUUID(), "name", "description", UUID.randomUUID());
+    assertDoesNotThrow(() -> Task.create(dto));
   }
 
   @Test
   void shouldCreateTaskInstance() {
-    var dto = new CreateTaskDto(UUID.randomUUID(), "name", "description");
-    var task = Task.create(dto, UUID.randomUUID());
+    var dto = new CreateTaskDto(UUID.randomUUID(), "name", "description", UUID.randomUUID());
+    var task = Task.create(dto);
     var taskDbDto = task.toDbDto(() -> new TaskDbDtoImpl() {});
     assertEquals(dto.id(), taskDbDto.getId());
   }

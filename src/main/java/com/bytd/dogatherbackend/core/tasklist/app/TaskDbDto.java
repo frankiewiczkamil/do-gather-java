@@ -1,4 +1,4 @@
-package com.bytd.dogatherbackend.core.tasklist.infra.db;
+package com.bytd.dogatherbackend.core.tasklist.app;
 
 import com.bytd.dogatherbackend.core.tasklist.TaskState;
 import java.util.UUID;

@@ -1,7 +1,7 @@
 package com.bytd.dogatherbackend.core.tasklist.infra.db.impl;
 
 import com.bytd.dogatherbackend.core.tasklist.TaskState;
-import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskDbDto;
+import com.bytd.dogatherbackend.core.tasklist.app.TaskDbDto;
 import java.util.UUID;
 import lombok.Data;
 

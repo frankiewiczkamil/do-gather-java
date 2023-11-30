@@ -14,9 +14,9 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class TaskListTest {
-  UUID taskListId = UUID.randomUUID();
-  UUID creatorId = UUID.randomUUID();
-  CreateTaskListDto createTaskListDto =
+  final UUID taskListId = UUID.randomUUID();
+  final UUID creatorId = UUID.randomUUID();
+  final CreateTaskListDto createTaskListDto =
       new CreateTaskListDto(taskListId, "name", "description", creatorId);
 
   @Test
@@ -36,8 +36,8 @@ class TaskListTest {
   @Test
   void shouldAddTasksToTheListWithoutExceptionWhenPayloadIsValid() {
     var taskList = TaskList.create(createTaskListDto);
-    var task1 = new CreateTaskDto(UUID.randomUUID(), "name", "description");
-    var task2 = new CreateTaskDto(UUID.randomUUID(), "name", "description");
+    var task1 = new CreateTaskDto(UUID.randomUUID(), "name", "description", createTaskListDto.id());
+    var task2 = new CreateTaskDto(UUID.randomUUID(), "name", "description", createTaskListDto.id());
 
     assertDoesNotThrow(() -> taskList.addTask(task1));
     assertDoesNotThrow(() -> taskList.addTask(task2));
@@ -46,8 +46,8 @@ class TaskListTest {
   @Test
   void shouldAddTasksToTheList() {
     var taskList = TaskList.create(createTaskListDto);
-    var task1 = new CreateTaskDto(UUID.randomUUID(), "name", "description");
-    var task2 = new CreateTaskDto(UUID.randomUUID(), "name", "description");
+    var task1 = new CreateTaskDto(UUID.randomUUID(), "name", "description", createTaskListDto.id());
+    var task2 = new CreateTaskDto(UUID.randomUUID(), "name", "description", createTaskListDto.id());
 
     taskList.addTask(task1);
     taskList.addTask(task2);
@@ -64,7 +64,8 @@ class TaskListTest {
 
   @Test
   void shouldNotAllowAddingTheSameTaskTwice() {
-    var createTaskDto = new CreateTaskDto(UUID.randomUUID(), "name", "description");
+    var createTaskDto =
+        new CreateTaskDto(UUID.randomUUID(), "name", "description", createTaskListDto.id());
     var taskList = TaskList.create(createTaskListDto);
 
     taskList.addTask(createTaskDto);
@@ -76,11 +77,11 @@ class TaskListTest {
     var taskList = TaskList.create(createTaskListDto);
 
     var addGuestParticipantDto =
-        new AddParticipantDto(UUID.randomUUID(), List.of(Role.GUEST), creatorId);
+        new AddParticipantDto(UUID.randomUUID(), List.of(Role.GUEST), creatorId, taskListId);
     var addEditorParticipantDto =
-        new AddParticipantDto(UUID.randomUUID(), List.of(Role.EDITOR), creatorId);
+        new AddParticipantDto(UUID.randomUUID(), List.of(Role.EDITOR), creatorId, taskListId);
     var addOwnerParticipantDto =
-        new AddParticipantDto(UUID.randomUUID(), List.of(Role.OWNER), creatorId);
+        new AddParticipantDto(UUID.randomUUID(), List.of(Role.OWNER), creatorId, taskListId);
 
     assertDoesNotThrow(() -> taskList.addParticipant(addGuestParticipantDto));
     assertDoesNotThrow(() -> taskList.addParticipant(addEditorParticipantDto));
@@ -92,7 +93,7 @@ class TaskListTest {
     var taskList = TaskList.create(createTaskListDto);
     var id = UUID.randomUUID();
     var expectedParticipant = new Participant(id, List.of(Role.OWNER));
-    var addParticipantDto = new AddParticipantDto(id, List.of(Role.OWNER), creatorId);
+    var addParticipantDto = new AddParticipantDto(id, List.of(Role.OWNER), creatorId, taskListId);
 
     taskList.addParticipant(addParticipantDto);
 
@@ -105,7 +106,7 @@ class TaskListTest {
   void shouldNotAllowAddingTheSameParticipantTwice() {
     var taskList = TaskList.create(createTaskListDto);
     var id = UUID.randomUUID();
-    var addParticipantDto = new AddParticipantDto(id, List.of(Role.OWNER), creatorId);
+    var addParticipantDto = new AddParticipantDto(id, List.of(Role.OWNER), creatorId, taskListId);
 
     taskList.addParticipant(addParticipantDto);
     assertThrows(ParticipantAlreadyAdded.class, () -> taskList.addParticipant(addParticipantDto));
@@ -115,7 +116,7 @@ class TaskListTest {
   void shouldNotAllowAddingParticipantWhenAuthorDoesNotExist() {
     var taskList = TaskList.create(createTaskListDto);
     var id = UUID.randomUUID();
-    var addParticipantDto = new AddParticipantDto(id, List.of(Role.OWNER), id);
+    var addParticipantDto = new AddParticipantDto(id, List.of(Role.OWNER), id, taskListId);
 
     assertThrows(AuthorIsNotAParticipant.class, () -> taskList.addParticipant(addParticipantDto));
   }
@@ -126,10 +127,11 @@ class TaskListTest {
     var existingGuest = UUID.randomUUID();
     var newGuest = UUID.randomUUID();
 
-    taskList.addParticipant(new AddParticipantDto(existingGuest, List.of(Role.GUEST), creatorId));
+    taskList.addParticipant(
+        new AddParticipantDto(existingGuest, List.of(Role.GUEST), creatorId, taskListId));
 
     var addGuestByAnotherGuestAttemptDto =
-        new AddParticipantDto(newGuest, List.of(Role.OWNER), existingGuest);
+        new AddParticipantDto(newGuest, List.of(Role.OWNER), existingGuest, taskListId);
 
     assertThrows(
         GuestNotAllowedToAddAnotherParticipant.class,
@@ -142,11 +144,12 @@ class TaskListTest {
     var newOwnerId = UUID.randomUUID();
     var newEditorId = UUID.randomUUID();
 
-    var addEditorDto = new AddParticipantDto(newEditorId, List.of(Role.EDITOR), creatorId);
+    var addEditorDto =
+        new AddParticipantDto(newEditorId, List.of(Role.EDITOR), creatorId, taskListId);
     taskList.addParticipant(addEditorDto);
 
     var addOwnerByEditorAttemptDto =
-        new AddParticipantDto(newOwnerId, List.of(Role.OWNER), newEditorId);
+        new AddParticipantDto(newOwnerId, List.of(Role.OWNER), newEditorId, taskListId);
 
     assertThrows(
         ParticipantRoleTooLowToAddAnotherParticipant.class,
