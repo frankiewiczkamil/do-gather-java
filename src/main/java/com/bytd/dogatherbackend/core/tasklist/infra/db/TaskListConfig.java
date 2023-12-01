@@ -1,4 +1,4 @@
-package com.bytd.dogatherbackend.core.tasklist.infra.db.impl;
+package com.bytd.dogatherbackend.core.tasklist.infra.db;
 
 import com.bytd.dogatherbackend.core.tasklist.app.TaskListService;
 import org.springframework.context.annotation.Bean;

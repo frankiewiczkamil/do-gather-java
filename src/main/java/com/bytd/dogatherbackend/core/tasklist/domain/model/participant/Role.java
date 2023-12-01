@@ -1,4 +1,4 @@
-package com.bytd.dogatherbackend.core.tasklist;
+package com.bytd.dogatherbackend.core.tasklist.domain.model.participant;
 
 import java.util.Comparator;
 import java.util.List;
@@ -9,11 +9,11 @@ public enum Role implements Comparable<Role> {
   OWNER;
   private static final Comparator<Role> comparator = new RoleComparator();
 
-  boolean isEditorOrOwner() {
+  public boolean isEditorOrOwner() {
     return this.equals(EDITOR) || this.equals(OWNER);
   }
 
-  static Role findHighestRole(List<Role> roles) {
+  public static Role findHighestRole(List<Role> roles) {
     var max = roles.stream().max(comparator);
     return max.orElseThrow(() -> new IllegalStateException("Roles list is empty"));
   }

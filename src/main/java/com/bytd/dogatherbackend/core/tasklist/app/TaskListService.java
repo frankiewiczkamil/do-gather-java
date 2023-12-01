@@ -1,6 +1,10 @@
 package com.bytd.dogatherbackend.core.tasklist.app;
 
-import com.bytd.dogatherbackend.core.tasklist.*;
+import com.bytd.dogatherbackend.core.tasklist.domain.*;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.*;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.AddParticipantDto;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskDto;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskListDto;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.TaskListDoesNotExist;
 import java.util.Optional;
 import java.util.UUID;

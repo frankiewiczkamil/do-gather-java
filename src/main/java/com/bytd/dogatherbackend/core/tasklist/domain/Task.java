@@ -1,6 +1,8 @@
-package com.bytd.dogatherbackend.core.tasklist;
+package com.bytd.dogatherbackend.core.tasklist.domain;
 
-import com.bytd.dogatherbackend.core.tasklist.app.TaskDbDto;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskDbDto;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskDto;
+import com.bytd.dogatherbackend.core.tasklist.domain.model.task.TaskState;
 import java.util.UUID;
 import java.util.function.Supplier;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,4 @@
-package com.bytd.dogatherbackend.core.tasklist;
+package com.bytd.dogatherbackend.core.tasklist.domain.model.participant;
 
 import java.util.List;
 import java.util.UUID;

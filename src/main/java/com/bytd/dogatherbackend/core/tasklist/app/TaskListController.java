@@ -1,8 +1,7 @@
-package com.bytd.dogatherbackend.core.tasklist.web;
+package com.bytd.dogatherbackend.core.tasklist.app;
 
-import com.bytd.dogatherbackend.core.tasklist.CreateTaskListDto;
-import com.bytd.dogatherbackend.core.tasklist.app.TaskListDbDto;
-import com.bytd.dogatherbackend.core.tasklist.app.TaskListService;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskListDbDto;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskListDto;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.*;

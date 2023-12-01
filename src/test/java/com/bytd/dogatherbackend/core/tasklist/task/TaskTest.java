@@ -3,9 +3,9 @@ package com.bytd.dogatherbackend.core.tasklist.task;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bytd.dogatherbackend.core.tasklist.CreateTaskDto;
-import com.bytd.dogatherbackend.core.tasklist.Task;
-import com.bytd.dogatherbackend.core.tasklist.infra.db.impl.TaskDbDtoImpl;
+import com.bytd.dogatherbackend.core.tasklist.domain.Task;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskDto;
+import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskDbDtoImpl;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 

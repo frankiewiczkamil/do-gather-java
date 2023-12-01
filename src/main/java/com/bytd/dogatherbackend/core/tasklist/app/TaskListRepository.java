@@ -1,6 +1,6 @@
-package com.bytd.dogatherbackend.core.tasklist;
+package com.bytd.dogatherbackend.core.tasklist.app;
 
-import com.bytd.dogatherbackend.core.tasklist.app.TaskListDbDto;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskListDbDto;
 import java.util.Optional;
 import java.util.UUID;
 

@@ -1,7 +1,7 @@
-package com.bytd.dogatherbackend.core.tasklist.infra.db.impl;
+package com.bytd.dogatherbackend.core.tasklist.infra.db;
 
-import com.bytd.dogatherbackend.core.tasklist.TaskListRepository;
-import com.bytd.dogatherbackend.core.tasklist.app.TaskListDbDto;
+import com.bytd.dogatherbackend.core.tasklist.app.TaskListRepository;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskListDbDto;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

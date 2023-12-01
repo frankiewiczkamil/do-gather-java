@@ -1,7 +1,12 @@
-package com.bytd.dogatherbackend.core.tasklist;
+package com.bytd.dogatherbackend.core.tasklist.domain;
 
-import com.bytd.dogatherbackend.core.tasklist.app.TaskDbDto;
-import com.bytd.dogatherbackend.core.tasklist.app.TaskListDbDto;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskDbDto;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskListDbDto;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.AddParticipantDto;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskDto;
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskListDto;
+import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Participant;
+import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Role;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.AuthorIsNotAParticipant;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.GuestNotAllowedToAddAnotherParticipant;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.ParticipantAlreadyAdded;

@@ -1,4 +1,4 @@
-package com.bytd.dogatherbackend.core.tasklist;
+package com.bytd.dogatherbackend.core.tasklist.domain.dto.command;
 
 import java.util.UUID;
 
