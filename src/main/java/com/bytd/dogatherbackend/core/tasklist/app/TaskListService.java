@@ -26,7 +26,7 @@ public class TaskListService {
   }
 
   public void addTask(CreateTaskDto dto) {
-    var taskListDbDto = taskListRepository.findById(dto.taskListId());
+    Optional<TaskListDbDto> taskListDbDto = taskListRepository.findById(dto.taskListId());
     if (taskListDbDto.isEmpty()) {
       throw new TaskListDoesNotExist(dto.taskListId());
     } else {
@@ -37,7 +37,7 @@ public class TaskListService {
   }
 
   public void addParticipant(AddParticipantDto dto) {
-    var taskListDbDto = taskListRepository.findById(dto.taskListId());
+    Optional<TaskListDbDto> taskListDbDto = taskListRepository.findById(dto.taskListId());
     if (taskListDbDto.isEmpty()) {
       throw new TaskListDoesNotExist(dto.taskListId());
     } else {

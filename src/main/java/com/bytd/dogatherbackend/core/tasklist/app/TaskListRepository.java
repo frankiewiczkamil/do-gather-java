@@ -4,9 +4,9 @@ import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskListDbDto;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface TaskListRepository {
+public interface TaskListRepository<T extends TaskListDbDto> {
 
-  Optional<TaskListDbDto> findById(UUID taskListId);
+  Optional<T> findById(UUID taskListId);
 
-  void save(TaskListDbDto taskList);
+  void save(T taskList);
 }

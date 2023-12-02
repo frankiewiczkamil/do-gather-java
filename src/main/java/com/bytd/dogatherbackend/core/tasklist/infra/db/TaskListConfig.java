@@ -1,15 +1,20 @@
 package com.bytd.dogatherbackend.core.tasklist.infra.db;
 
+import com.bytd.dogatherbackend.core.tasklist.app.TaskListRepository;
 import com.bytd.dogatherbackend.core.tasklist.app.TaskListService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class TaskListConfig {
 
+  @Autowired TaskListRepository taskListRepository;
+
   @Bean
   TaskListService taskListService() {
-    return new TaskListService(
-        new TaskListTmpRepository(), TaskListDbDtoImpl::new, TaskDbDtoImpl::new);
+    //    TaskListRepository taskListRepository = new TaskListTmpRepository();
+
+    return new TaskListService(taskListRepository, TaskListDbDtoImpl::new, TaskDbDtoImpl::new);
   }
 }
