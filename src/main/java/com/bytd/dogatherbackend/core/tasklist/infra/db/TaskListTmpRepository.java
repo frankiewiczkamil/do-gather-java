@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class TaskListTmpRepository implements TaskListRepository {
+public class TaskListTmpRepository implements TaskListRepository<TaskListDbDto> {
   private final Map<UUID, TaskListDbDto> taskLists = new HashMap<>();
 
   @Override
@@ -16,7 +16,8 @@ public class TaskListTmpRepository implements TaskListRepository {
   }
 
   @Override
-  public void save(TaskListDbDto taskList) {
+  public TaskListDbDto save(TaskListDbDto taskList) {
     taskLists.put(taskList.getId(), taskList);
+    return taskList;
   }
 }

@@ -8,5 +8,5 @@ public interface TaskListRepository<T extends TaskListDbDto> {
 
   Optional<T> findById(UUID taskListId);
 
-  void save(T taskList);
+  T save(T taskList);
 }

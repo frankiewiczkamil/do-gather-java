@@ -14,7 +14,7 @@ import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.Participant
 import java.util.*;
 import java.util.function.Supplier;
 
-public class TaskList {
+public class TaskList<TaskListDto extends TaskListDbDto, TaskDto extends TaskDbDto> {
 
   private UUID id;
   private String name;
@@ -23,8 +23,9 @@ public class TaskList {
   private List<Task> tasks;
   private UUID creatorId;
 
-  public static TaskList create(CreateTaskListDto dto) {
-    var instance = new TaskList();
+  public static <TaskListDto extends TaskListDbDto, TaskDto extends TaskDbDto>
+      TaskList<TaskListDto, TaskDto> create(CreateTaskListDto dto) {
+    var instance = new TaskList<TaskListDto, TaskDto>();
     instance.id = dto.id();
     instance.name = dto.name();
     instance.description = dto.description();
@@ -82,20 +83,21 @@ public class TaskList {
     return p.roles().stream().toList().toString();
   }
 
-  public TaskListDbDto toDbDto(
-      Supplier<TaskListDbDto> listDbDtoSupplier, Supplier<TaskDbDto> taskDbDtoSupplier) {
+  public TaskListDto toDbDto(
+      Supplier<TaskListDto> listDbDtoSupplier, Supplier<TaskDto> taskDbDtoSupplier) {
     var dto = listDbDtoSupplier.get();
     dto.setId(id);
     dto.setName(name);
     dto.setDescription(description);
     dto.setCreatorId(creatorId);
     dto.setParticipants(participants);
-    dto.setTasks(tasks.stream().map(task -> task.toDbDto(taskDbDtoSupplier)).toList());
+    dto.setTasks(tasks.stream().map(task -> task.toDbDto(() -> taskDbDtoSupplier.get())).toList());
     return dto;
   }
 
-  public static TaskList fromDbDto(TaskListDbDto dto) {
-    var instance = new TaskList();
+  public static <TaskListDto extends TaskListDbDto, TaskDto extends TaskDbDto>
+      TaskList<TaskListDto, TaskDto> fromDbDto(TaskListDto dto) {
+    var instance = new TaskList<TaskListDto, TaskDto>();
     instance.id = dto.getId();
     instance.name = dto.getName();
     instance.description = dto.getDescription();

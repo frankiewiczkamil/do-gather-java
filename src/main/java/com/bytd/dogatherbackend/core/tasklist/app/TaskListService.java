@@ -12,46 +12,46 @@ import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class TaskListService {
-  private TaskListRepository taskListRepository;
-  private Supplier<TaskListDbDto> taskListDbDtoSupplier;
-  private Supplier<TaskDbDto> taskDbDtoSupplier;
+public class TaskListService<TaskListDto extends TaskListDbDto, TaskDto extends TaskDbDto> {
+  private TaskListRepository<TaskListDto> taskListRepository;
+  private Supplier<TaskListDto> taskListDbDtoSupplier;
+  private Supplier<TaskDto> taskDbDtoSupplier;
 
-  public TaskListDbDto createTaskList(CreateTaskListDto dto) {
+  public TaskListDto createTaskList(CreateTaskListDto dto) {
     dto = dto.id() == null ? dto.withId(UUID.randomUUID()) : dto;
-    var taskList = TaskList.create(dto);
+    TaskList<TaskListDto, TaskDto> taskList = TaskList.create(dto);
     var taskListDbDto = toTaskListDbDto(taskList);
     taskListRepository.save(taskListDbDto);
     return taskListDbDto;
   }
 
   public void addTask(CreateTaskDto dto) {
-    Optional<TaskListDbDto> taskListDbDto = taskListRepository.findById(dto.taskListId());
+    Optional<TaskListDto> taskListDbDto = taskListRepository.findById(dto.taskListId());
     if (taskListDbDto.isEmpty()) {
       throw new TaskListDoesNotExist(dto.taskListId());
     } else {
-      var taskList = TaskList.fromDbDto(taskListDbDto.get());
+      TaskList<TaskListDto, TaskDto> taskList = TaskList.fromDbDto(taskListDbDto.get());
       taskList.addTask(dto);
       taskListRepository.save(toTaskListDbDto(taskList));
     }
   }
 
   public void addParticipant(AddParticipantDto dto) {
-    Optional<TaskListDbDto> taskListDbDto = taskListRepository.findById(dto.taskListId());
+    Optional<TaskListDto> taskListDbDto = taskListRepository.findById(dto.taskListId());
     if (taskListDbDto.isEmpty()) {
       throw new TaskListDoesNotExist(dto.taskListId());
     } else {
-      var taskList = TaskList.fromDbDto(taskListDbDto.get());
+      TaskList<TaskListDto, TaskDto> taskList = TaskList.fromDbDto(taskListDbDto.get());
       taskList.addParticipant(dto);
       taskListRepository.save(toTaskListDbDto(taskList));
     }
   }
 
-  private TaskListDbDto toTaskListDbDto(TaskList taskList) {
+  private TaskListDto toTaskListDbDto(TaskList<TaskListDto, TaskDto> taskList) {
     return taskList.toDbDto(taskListDbDtoSupplier, taskDbDtoSupplier);
   }
 
-  public Optional<TaskListDbDto> getTaskList(UUID taskListId) {
+  public Optional<TaskListDto> getTaskList(UUID taskListId) {
     var taskListDbDto = taskListRepository.findById(taskListId);
     if (taskListDbDto.isEmpty()) {
       throw new IllegalArgumentException("Task list does not exist");
