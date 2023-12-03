@@ -19,5 +19,7 @@ public class TaskDbDtoImpl implements TaskDbDto {
   private int timeSpent;
   private String name;
   private String description;
+
+  @Column(name = "task_list_id")
   private UUID taskListId;
 }

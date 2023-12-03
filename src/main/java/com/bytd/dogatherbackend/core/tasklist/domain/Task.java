@@ -30,7 +30,7 @@ public class Task {
     return instance;
   }
 
-  public static Task fromDbDto(TaskDbDto dto) {
+  public static <DTO extends TaskDbDto> Task fromDbDto(DTO dto) {
     var instance = new Task();
     instance.id = dto.getId();
     instance.name = dto.getName();

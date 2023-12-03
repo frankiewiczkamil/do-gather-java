@@ -91,19 +91,20 @@ public class TaskList<TaskListDto extends TaskListDbDto, TaskDto extends TaskDbD
     dto.setDescription(description);
     dto.setCreatorId(creatorId);
     dto.setParticipants(participants);
-    dto.setTasks(tasks.stream().map(task -> task.toDbDto(() -> taskDbDtoSupplier.get())).toList());
+    dto.setTasks(tasks.stream().map(task -> task.toDbDto(taskDbDtoSupplier::get)).toList());
     return dto;
   }
 
   public static <TaskListDto extends TaskListDbDto, TaskDto extends TaskDbDto>
       TaskList<TaskListDto, TaskDto> fromDbDto(TaskListDto dto) {
+    List<TaskDto> tasks = dto.getTasks();
     var instance = new TaskList<TaskListDto, TaskDto>();
     instance.id = dto.getId();
     instance.name = dto.getName();
     instance.description = dto.getDescription();
     instance.creatorId = dto.getCreatorId();
     instance.participants = dto.getParticipants();
-    instance.tasks = dto.getTasks().stream().map(Task::fromDbDto).toList();
+    instance.tasks = tasks.stream().map(Task::fromDbDto).toList();
     return instance;
   }
 }

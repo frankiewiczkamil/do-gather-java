@@ -4,7 +4,7 @@ import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Participa
 import java.util.List;
 import java.util.UUID;
 
-public interface TaskListDbDto {
+public interface TaskListDbDto<TaskDto extends TaskDbDto> {
   void setId(UUID id);
 
   UUID getId();
@@ -25,7 +25,7 @@ public interface TaskListDbDto {
 
   List<Participant> getParticipants();
 
-  void setTasks(List<TaskDbDto> tasks);
+  void setTasks(List<TaskDto> tasks);
 
-  List<TaskDbDto> getTasks();
+  List<TaskDto> getTasks();
 }
