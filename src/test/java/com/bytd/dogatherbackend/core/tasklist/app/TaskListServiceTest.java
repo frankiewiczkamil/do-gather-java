@@ -9,9 +9,9 @@ import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskListD
 import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Participant;
 import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Role;
 import com.bytd.dogatherbackend.core.tasklist.domain.model.task.TaskState;
-import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskDbDtoImpl;
-import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskListDbDtoImpl;
-import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskListTmpRepository;
+import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.TaskDbDtoFakeImpl;
+import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.TaskListDbDtoFakeImpl;
+import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.TaskListFakeRepository;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -20,13 +20,14 @@ class TaskListServiceTest {
 
   @Test
   void itShouldCreateNewList() {
-    var repo = new TaskListTmpRepository();
-    var taskListService = new TaskListService(repo, TaskListDbDtoImpl::new, TaskDbDtoImpl::new);
+    var repo = new TaskListFakeRepository();
+    var taskListService =
+        new TaskListService<>(repo, TaskListDbDtoFakeImpl::new, TaskDbDtoFakeImpl::new);
 
     var createListDto =
         new CreateTaskListDto(UUID.randomUUID(), "name", "description", UUID.randomUUID());
     taskListService.createTaskList(createListDto);
-    var expected = new TaskListDbDtoImpl();
+    var expected = new TaskListDbDtoFakeImpl();
     expected.setId(createListDto.id());
     expected.setName("name");
     expected.setDescription("description");
@@ -40,15 +41,16 @@ class TaskListServiceTest {
 
   @Test
   void itShouldAddNewTaskToList() {
-    var repo = new TaskListTmpRepository();
-    var taskListService = new TaskListService(repo, TaskListDbDtoImpl::new, TaskDbDtoImpl::new);
+    var repo = new TaskListFakeRepository();
+    var taskListService =
+        new TaskListService<>(repo, TaskListDbDtoFakeImpl::new, TaskDbDtoFakeImpl::new);
     var taskListDto =
         new CreateTaskListDto(UUID.randomUUID(), "name", "description", UUID.randomUUID());
     taskListService.createTaskList(taskListDto);
 
     var addTaskDto = new CreateTaskDto(UUID.randomUUID(), "name", "description", taskListDto.id());
     taskListService.addTask(addTaskDto);
-    var expected = new TaskListDbDtoImpl();
+    var expected = new TaskListDbDtoFakeImpl();
     expected.setId(taskListDto.id());
     expected.setName("name");
     expected.setDescription("description");
@@ -56,7 +58,7 @@ class TaskListServiceTest {
     expected.setParticipants(
         List.of(new Participant(taskListDto.creatorId(), List.of(Role.OWNER))));
 
-    var expectedTask = new TaskDbDtoImpl();
+    var expectedTask = new TaskDbDtoFakeImpl();
     expectedTask.setId(addTaskDto.id());
     expectedTask.setName("name");
     expectedTask.setDescription("description");
@@ -72,8 +74,9 @@ class TaskListServiceTest {
 
   @Test
   void itShouldAddNewParticipant() {
-    var repo = new TaskListTmpRepository();
-    var taskListService = new TaskListService(repo, TaskListDbDtoImpl::new, TaskDbDtoImpl::new);
+    var repo = new TaskListFakeRepository();
+    var taskListService =
+        new TaskListService<>(repo, TaskListDbDtoFakeImpl::new, TaskDbDtoFakeImpl::new);
     var taskListDto =
         new CreateTaskListDto(UUID.randomUUID(), "name", "description", UUID.randomUUID());
     taskListService.createTaskList(taskListDto);
@@ -82,7 +85,7 @@ class TaskListServiceTest {
         new AddParticipantDto(
             UUID.randomUUID(), List.of(Role.EDITOR), taskListDto.creatorId(), taskListDto.id());
     taskListService.addParticipant(addParticipantDto);
-    var expected = new TaskListDbDtoImpl();
+    var expected = new TaskListDbDtoFakeImpl();
     expected.setId(taskListDto.id());
     expected.setName("name");
     expected.setDescription("description");

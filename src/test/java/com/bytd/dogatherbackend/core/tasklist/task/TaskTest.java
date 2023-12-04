@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytd.dogatherbackend.core.tasklist.domain.Task;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskDto;
-import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskDbDtoImpl;
+import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.TaskDbDtoFakeImpl;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ class TaskTest {
   void shouldCreateTaskInstance() {
     var dto = new CreateTaskDto(UUID.randomUUID(), "name", "description", UUID.randomUUID());
     var task = Task.create(dto);
-    var taskDbDto = task.toDbDto(() -> new TaskDbDtoImpl() {});
+    var taskDbDto = task.toDbDto(() -> new TaskDbDtoFakeImpl() {});
     assertEquals(dto.id(), taskDbDto.getId());
   }
 }

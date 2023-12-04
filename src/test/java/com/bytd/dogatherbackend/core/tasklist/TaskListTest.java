@@ -13,8 +13,8 @@ import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.AuthorIsNot
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.GuestNotAllowedToAddAnotherParticipant;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.ParticipantAlreadyAdded;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.ParticipantRoleTooLowToAddAnotherParticipant;
-import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskDbDtoImpl;
-import com.bytd.dogatherbackend.core.tasklist.infra.db.TaskListDbDtoImpl;
+import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.TaskDbDtoFakeImpl;
+import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.TaskListDbDtoFakeImpl;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ class TaskListTest {
   @Test
   void shouldCreateTaskListWithValidState() {
     var taskList = TaskList.create(createTaskListDto);
-    var taskListDbDto = taskList.toDbDto(TaskListDbDtoImpl::new, TaskDbDtoImpl::new);
+    var taskListDbDto = taskList.toDbDto(TaskListDbDtoFakeImpl::new, TaskDbDtoFakeImpl::new);
     assertEquals(taskListId, taskListDbDto.getId());
     assertEquals("name", taskListDbDto.getName());
     assertEquals("description", taskListDbDto.getDescription());
@@ -58,7 +58,7 @@ class TaskListTest {
     taskList.addTask(task1);
     taskList.addTask(task2);
 
-    var taskListDbDto = taskList.toDbDto(TaskListDbDtoImpl::new, TaskDbDtoImpl::new);
+    var taskListDbDto = taskList.toDbDto(TaskListDbDtoFakeImpl::new, TaskDbDtoFakeImpl::new);
 
     assertEquals(2, taskListDbDto.getTasks().size());
 
@@ -103,7 +103,7 @@ class TaskListTest {
 
     taskList.addParticipant(addParticipantDto);
 
-    var taskListDbDto = taskList.toDbDto(TaskListDbDtoImpl::new, TaskDbDtoImpl::new);
+    var taskListDbDto = taskList.toDbDto(TaskListDbDtoFakeImpl::new, TaskDbDtoFakeImpl::new);
     assertEquals(2, taskListDbDto.getParticipants().size());
     assertEquals(expectedParticipant, taskListDbDto.getParticipants().get(1));
   }
