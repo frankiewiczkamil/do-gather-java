@@ -2,7 +2,6 @@ package com.bytd.dogatherbackend.core.tasklist.app;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskDbDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskListDbDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.AddParticipantDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskDto;
@@ -19,8 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class TaskListServiceTest {
-  private TaskListService<? extends TaskListDbDto<? extends TaskDbDto>, ? extends TaskDbDto>
-      taskListService;
+  private TaskListService taskListService;
 
   @BeforeEach
   void setUp() {
@@ -42,8 +40,7 @@ class TaskListServiceTest {
   void itShouldAddNewTaskToList() {
     var createTaskListDto = generateCreateTaskListDto();
     taskListService.createTaskList(createTaskListDto);
-    TaskListDbDto<TaskDbDtoFakeImpl> expectedTaskList =
-        createTaskListDtoFromCreateCommand(createTaskListDto);
+    TaskListDbDto expectedTaskList = createTaskListDtoFromCreateCommand(createTaskListDto);
     var addTaskDto =
         new CreateTaskDto(
             UUID.randomUUID(), "task's name", "task's description", createTaskListDto.id());
@@ -86,8 +83,7 @@ class TaskListServiceTest {
     assertEquals(expectedTaskListDto, taskListService.getTaskList(createTaskListDto.id()).get());
   }
 
-  private TaskListDbDto<TaskDbDtoFakeImpl> createTaskListDtoFromCreateCommand(
-      CreateTaskListDto createTaskListDto) {
+  private TaskListDbDto createTaskListDtoFromCreateCommand(CreateTaskListDto createTaskListDto) {
     var expected = new TaskListDbDtoFakeImpl();
     expected.setId(createTaskListDto.id());
     expected.setName(createTaskListDto.name());
@@ -104,6 +100,7 @@ class TaskListServiceTest {
         UUID.randomUUID(),
         "name_" + UUID.randomUUID(),
         "description_" + UUID.randomUUID(),
-        UUID.randomUUID());
+        UUID.randomUUID(),
+        null);
   }
 }

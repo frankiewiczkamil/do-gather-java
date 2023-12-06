@@ -5,9 +5,11 @@ import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.model.task.TaskState;
 import java.util.UUID;
 import java.util.function.Supplier;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+@Data
 public class Task {
   private UUID id;
   private TaskState state;
@@ -30,7 +32,7 @@ public class Task {
     return instance;
   }
 
-  public static <DTO extends TaskDbDto> Task fromDbDto(DTO dto) {
+  public static Task fromDbDto(TaskDbDto dto) {
     var instance = new Task();
     instance.id = dto.getId();
     instance.name = dto.getName();
@@ -56,5 +58,10 @@ public class Task {
     dto.setDescription(description);
     dto.setTaskListId(taskListId);
     return dto;
+  }
+
+  public Task withId() {
+    if (this.id == null) this.id = UUID.randomUUID();
+    return this;
   }
 }

@@ -23,7 +23,7 @@ class TaskListTest {
   final UUID taskListId = UUID.randomUUID();
   final UUID creatorId = UUID.randomUUID();
   final CreateTaskListDto createTaskListDto =
-      new CreateTaskListDto(taskListId, "name", "description", creatorId);
+      new CreateTaskListDto(taskListId, "name", "description", creatorId, null);
 
   @Test
   void shouldRunCreateTaskListInstanceWithoutExceptionWhenPayloadIsValid() {

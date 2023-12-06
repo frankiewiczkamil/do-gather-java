@@ -14,7 +14,7 @@ import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.Participant
 import java.util.*;
 import java.util.function.Supplier;
 
-public class TaskList<TaskListDto extends TaskListDbDto, TaskDto extends TaskDbDto> {
+public class TaskList {
 
   private UUID id;
   private String name;
@@ -23,9 +23,8 @@ public class TaskList<TaskListDto extends TaskListDbDto, TaskDto extends TaskDbD
   private List<Task> tasks;
   private UUID creatorId;
 
-  public static <TaskListDto extends TaskListDbDto, TaskDto extends TaskDbDto>
-      TaskList<TaskListDto, TaskDto> create(CreateTaskListDto dto) {
-    var instance = new TaskList<TaskListDto, TaskDto>();
+  public static TaskList create(CreateTaskListDto dto) {
+    var instance = new TaskList();
     instance.id = dto.id();
     instance.name = dto.name();
     instance.description = dto.description();
@@ -34,7 +33,7 @@ public class TaskList<TaskListDto extends TaskListDbDto, TaskDto extends TaskDbD
     var roles = new LinkedList<Role>();
     roles.add(Role.OWNER);
     instance.participants.add(new Participant(dto.creatorId(), roles));
-    instance.tasks = new LinkedList<>();
+    instance.tasks = dto.tasks() == null ? List.of() : dto.tasks();
 
     return instance;
   }
@@ -83,28 +82,27 @@ public class TaskList<TaskListDto extends TaskListDbDto, TaskDto extends TaskDbD
     return p.roles().stream().toList().toString();
   }
 
-  public TaskListDto toDbDto(
-      Supplier<TaskListDto> listDbDtoSupplier, Supplier<TaskDto> taskDbDtoSupplier) {
-    var dto = listDbDtoSupplier.get();
+  public TaskListDbDto toDbDto(
+      Supplier<TaskListDbDto> listDbDtoSupplier, Supplier<TaskDbDto> taskDbDtoSupplier) {
+    TaskListDbDto dto = listDbDtoSupplier.get();
     dto.setId(id);
     dto.setName(name);
     dto.setDescription(description);
     dto.setCreatorId(creatorId);
     dto.setParticipants(participants);
-    dto.setTasks(tasks.stream().map(task -> task.toDbDto(taskDbDtoSupplier::get)).toList());
+    dto.setTasks(tasks.stream().map(task -> task.toDbDto(taskDbDtoSupplier)).toList());
     return dto;
   }
 
-  public static <TaskListDto extends TaskListDbDto, TaskDto extends TaskDbDto>
-      TaskList<TaskListDto, TaskDto> fromDbDto(TaskListDto dto) {
-    List<TaskDto> tasks = dto.getTasks();
-    var instance = new TaskList<TaskListDto, TaskDto>();
+  public static TaskList fromDbDto(TaskListDbDto dto) {
+    List<TaskDbDto> tasks = dto.getTasks();
+    var instance = new TaskList();
     instance.id = dto.getId();
     instance.name = dto.getName();
     instance.description = dto.getDescription();
     instance.creatorId = dto.getCreatorId();
     instance.participants = dto.getParticipants();
-    instance.tasks = tasks.stream().map(Task::fromDbDto).toList();
+    instance.tasks = tasks == null ? List.of() : tasks.stream().map(Task::fromDbDto).toList();
     return instance;
   }
 }
