@@ -2,16 +2,18 @@ package com.bytd.dogatherbackend.core.tasklist.app;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.PermissionDbDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskListDbDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.AddParticipantDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskListDto;
-import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Participant;
 import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Role;
 import com.bytd.dogatherbackend.core.tasklist.domain.model.task.TaskState;
 import com.bytd.dogatherbackend.core.tasklist.infra.TaskListServiceConfig;
+import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.PermissionDbDtoFakeImpl;
 import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.TaskDbDtoFakeImpl;
 import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.TaskListDbDtoFakeImpl;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +33,11 @@ class TaskListServiceTest {
     var expectedTaskList = createTaskListDtoFromCreateCommand(createTaskListDto);
 
     var returnedList = taskListService.createTaskList(createTaskListDto);
+
+    expectedTaskList
+        .getPermissions()
+        .getLast()
+        .setId(returnedList.getPermissions().getLast().getId()); // tmp workaround for id
 
     assertEquals(expectedTaskList, returnedList);
     assertEquals(expectedTaskList, taskListService.getTaskList(createTaskListDto.id()).get());
@@ -73,10 +80,18 @@ class TaskListServiceTest {
             createTaskListDto.creatorId(),
             createTaskListDto.id());
     var expectedTaskListDto = createTaskListDtoFromCreateCommand(createTaskListDto);
-    expectedTaskListDto.setParticipants(
-        List.of(
-            new Participant(createTaskListDto.creatorId(), List.of(Role.OWNER)),
-            new Participant(addParticipantDto.participantId(), List.of(Role.EDITOR))));
+    var p1 = new PermissionDbDtoFakeImpl();
+    p1.setParticipantId(createTaskListDto.creatorId());
+    p1.setRole(Role.OWNER.name());
+    p1.setTaskListId(createTaskListDto.id());
+    var p2 = new PermissionDbDtoFakeImpl();
+    p2.setParticipantId(addParticipantDto.participantId());
+    p2.setRole(Role.EDITOR.name());
+    p2.setTaskListId(createTaskListDto.id());
+    List<PermissionDbDto> expectedPermissions = new LinkedList<>();
+    expectedPermissions.add(p1);
+    expectedPermissions.add(p2);
+    expectedTaskListDto.setPermissions(expectedPermissions);
 
     taskListService.addParticipant(addParticipantDto);
 
@@ -89,8 +104,13 @@ class TaskListServiceTest {
     expected.setName(createTaskListDto.name());
     expected.setDescription(createTaskListDto.description());
     expected.setCreatorId(createTaskListDto.creatorId());
-    expected.setParticipants(
-        List.of(new Participant(createTaskListDto.creatorId(), List.of(Role.OWNER))));
+    var permission = new PermissionDbDtoFakeImpl();
+    permission.setParticipantId(createTaskListDto.creatorId());
+    permission.setRole(Role.OWNER.name());
+    permission.setTaskListId(createTaskListDto.id());
+    LinkedList<PermissionDbDto> permissions = new LinkedList<>();
+    permissions.add(permission);
+    expected.setPermissions(permissions);
     expected.setTasks(List.of());
     return expected;
   }

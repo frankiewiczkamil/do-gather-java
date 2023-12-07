@@ -9,8 +9,8 @@ public enum Role implements Comparable<Role> {
   OWNER;
   private static final Comparator<Role> comparator = new RoleComparator();
 
-  public boolean isEditorOrOwner() {
-    return this.equals(EDITOR) || this.equals(OWNER);
+  public boolean isGuest() {
+    return this.equals(GUEST);
   }
 
   public static Role findHighestRole(List<Role> roles) {

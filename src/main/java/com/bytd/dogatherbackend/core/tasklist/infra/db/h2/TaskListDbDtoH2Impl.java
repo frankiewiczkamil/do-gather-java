@@ -1,6 +1,5 @@
 package com.bytd.dogatherbackend.core.tasklist.infra.db.h2;
 
-import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Participant;
 import jakarta.persistence.*;
 import java.util.List;
 import java.util.UUID;
@@ -13,7 +12,10 @@ public class TaskListDbDtoH2Impl {
   @Id private UUID id;
   private String name;
   private String description;
-  @Transient private List<Participant> participants;
+
+  @OneToMany(cascade = CascadeType.ALL)
+  @JoinColumn(name = "task_list_id")
+  private List<PermissionDbDtoH2Impl> participants;
 
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "task_list_id")

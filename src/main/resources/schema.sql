@@ -20,12 +20,6 @@ create table task
     creator_id   UUID
 );
 
-create table participant
-(
-    id         UUID primary key,
-    created_at timestamp default current_timestamp
-);
-
 create table permission
 (
     id             UUID primary key,

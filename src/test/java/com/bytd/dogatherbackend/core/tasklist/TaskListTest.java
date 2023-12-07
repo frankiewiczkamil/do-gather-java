@@ -7,12 +7,12 @@ import com.bytd.dogatherbackend.core.tasklist.domain.*;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.AddParticipantDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskListDto;
-import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Participant;
 import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Role;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.AuthorIsNotAParticipant;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.GuestNotAllowedToAddAnotherParticipant;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.ParticipantAlreadyAdded;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.ParticipantRoleTooLowToAddAnotherParticipant;
+import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.PermissionDbDtoFakeImpl;
 import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.TaskDbDtoFakeImpl;
 import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.TaskListDbDtoFakeImpl;
 import java.util.List;
@@ -33,7 +33,9 @@ class TaskListTest {
   @Test
   void shouldCreateTaskListWithValidState() {
     var taskList = TaskList.create(createTaskListDto);
-    var taskListDbDto = taskList.toDbDto(TaskListDbDtoFakeImpl::new, TaskDbDtoFakeImpl::new);
+    var taskListDbDto =
+        taskList.toDbDto(
+            TaskListDbDtoFakeImpl::new, TaskDbDtoFakeImpl::new, PermissionDbDtoFakeImpl::new);
     assertEquals(taskListId, taskListDbDto.getId());
     assertEquals("name", taskListDbDto.getName());
     assertEquals("description", taskListDbDto.getDescription());
@@ -58,7 +60,9 @@ class TaskListTest {
     taskList.addTask(task1);
     taskList.addTask(task2);
 
-    var taskListDbDto = taskList.toDbDto(TaskListDbDtoFakeImpl::new, TaskDbDtoFakeImpl::new);
+    var taskListDbDto =
+        taskList.toDbDto(
+            TaskListDbDtoFakeImpl::new, TaskDbDtoFakeImpl::new, PermissionDbDtoFakeImpl::new);
 
     assertEquals(2, taskListDbDto.getTasks().size());
 
@@ -98,14 +102,20 @@ class TaskListTest {
   void shouldAddParticipantToTheList() {
     var taskList = TaskList.create(createTaskListDto);
     var id = UUID.randomUUID();
-    var expectedParticipant = new Participant(id, List.of(Role.OWNER));
+    var expectedPermission = new PermissionDbDtoFakeImpl();
+    expectedPermission.setParticipantId(id);
+    expectedPermission.setRole(Role.OWNER.name());
+    expectedPermission.setTaskListId(taskListId);
+
     var addParticipantDto = new AddParticipantDto(id, List.of(Role.OWNER), creatorId, taskListId);
 
     taskList.addParticipant(addParticipantDto);
 
-    var taskListDbDto = taskList.toDbDto(TaskListDbDtoFakeImpl::new, TaskDbDtoFakeImpl::new);
-    assertEquals(2, taskListDbDto.getParticipants().size());
-    assertEquals(expectedParticipant, taskListDbDto.getParticipants().get(1));
+    var taskListDbDto =
+        taskList.toDbDto(
+            TaskListDbDtoFakeImpl::new, TaskDbDtoFakeImpl::new, PermissionDbDtoFakeImpl::new);
+    assertEquals(2, taskListDbDto.getPermissions().size());
+    assertEquals(expectedPermission, taskListDbDto.getPermissions().get(1));
   }
 
   @Test

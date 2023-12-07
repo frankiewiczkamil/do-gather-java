@@ -1,11 +1,12 @@
 package com.bytd.dogatherbackend.core.tasklist.domain;
 
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.PermissionDbDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskDbDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskListDbDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.AddParticipantDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.command.CreateTaskListDto;
-import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Participant;
+import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Permission;
 import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Role;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.AuthorIsNotAParticipant;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.GuestNotAllowedToAddAnotherParticipant;
@@ -13,13 +14,14 @@ import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.Participant
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.ParticipantRoleTooLowToAddAnotherParticipant;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class TaskList {
 
   private UUID id;
   private String name;
   private String description;
-  private List<Participant> participants;
+  private List<Permission> permissions;
   private List<Task> tasks;
   private UUID creatorId;
 
@@ -29,10 +31,8 @@ public class TaskList {
     instance.name = dto.name();
     instance.description = dto.description();
     instance.creatorId = dto.creatorId();
-    instance.participants = new LinkedList<>();
-    var roles = new LinkedList<Role>();
-    roles.add(Role.OWNER);
-    instance.participants.add(new Participant(dto.creatorId(), roles));
+    instance.permissions = new LinkedList<>();
+    instance.permissions.add(new Permission(dto.creatorId(), Role.OWNER));
     instance.tasks = dto.tasks() == null ? List.of() : dto.tasks();
 
     return instance;
@@ -49,47 +49,53 @@ public class TaskList {
   }
 
   public void addParticipant(AddParticipantDto dto) {
-    var author = getParticipant(dto.authorId());
-    if (author.isEmpty()) {
+    var authorPermissions = getPermissions(dto.authorId());
+    if (authorPermissions.isEmpty()) {
       throw new AuthorIsNotAParticipant(dto.authorId());
-    } else if (participants.stream().anyMatch(p -> p.participantId().equals(dto.participantId()))) {
+    } else if (this.permissions.stream()
+        .anyMatch(p -> p.participantId().equals(dto.participantId()))) {
       throw new ParticipantAlreadyAdded(dto.participantId());
-    } else if (author.get().roles().stream().noneMatch(Role::isEditorOrOwner)) {
+    } else if (authorPermissions.stream().map(Permission::role).allMatch(Role::isGuest)) {
       throw new GuestNotAllowedToAddAnotherParticipant(dto.authorId());
     } else if (isRoleToBeAddedHigherThanAuthorRole(dto)) {
-      throw new ParticipantRoleTooLowToAddAnotherParticipant(getRolesString(author.get()));
+      throw new ParticipantRoleTooLowToAddAnotherParticipant(
+          authorPermissions.stream()
+              .map(Permission::role)
+              .map(Role::toString)
+              .collect(Collectors.joining(", ")));
     } else {
-      participants.add(new Participant(dto.participantId(), dto.roles()));
+      this.permissions = new LinkedList<>(this.permissions);
+      this.permissions.addAll(
+          dto.roles().stream().map(role -> new Permission(dto.participantId(), role)).toList());
     }
   }
 
   private boolean isRoleToBeAddedHigherThanAuthorRole(AddParticipantDto dto) {
-    var maybeAuthor = getParticipant(dto.authorId());
-    if (maybeAuthor.isEmpty()) {
+    var authorPermissions = getPermissions(dto.authorId());
+    if (authorPermissions.isEmpty()) {
       throw new AuthorIsNotAParticipant(dto.authorId());
     }
-    var authorRoles = maybeAuthor.get().roles();
+    var authorRoles = authorPermissions.stream().map(Permission::role).toList();
     var authorHighestRole = Role.findHighestRole(authorRoles);
     var roleToBeAddedHighestRole = Role.findHighestRole(dto.roles());
     return roleToBeAddedHighestRole.compareTo(authorHighestRole) > 0;
   }
 
-  private Optional<Participant> getParticipant(UUID participantId) {
-    return participants.stream().filter(p -> p.participantId().equals(participantId)).findFirst();
-  }
-
-  private String getRolesString(Participant p) {
-    return p.roles().stream().toList().toString();
+  private List<Permission> getPermissions(UUID participantId) {
+    return permissions.stream().filter(p -> p.participantId().equals(participantId)).toList();
   }
 
   public TaskListDbDto toDbDto(
-      Supplier<TaskListDbDto> listDbDtoSupplier, Supplier<TaskDbDto> taskDbDtoSupplier) {
+      Supplier<TaskListDbDto> listDbDtoSupplier,
+      Supplier<TaskDbDto> taskDbDtoSupplier,
+      Supplier<PermissionDbDto> permissionDbDtoSupplier) {
     TaskListDbDto dto = listDbDtoSupplier.get();
     dto.setId(id);
     dto.setName(name);
     dto.setDescription(description);
     dto.setCreatorId(creatorId);
-    dto.setParticipants(participants);
+    dto.setPermissions(
+        permissions.stream().map(p -> p.toDbDto(permissionDbDtoSupplier, id)).toList());
     dto.setTasks(tasks.stream().map(task -> task.toDbDto(taskDbDtoSupplier)).toList());
     return dto;
   }
@@ -101,8 +107,12 @@ public class TaskList {
     instance.name = dto.getName();
     instance.description = dto.getDescription();
     instance.creatorId = dto.getCreatorId();
-    instance.participants = dto.getParticipants();
-    instance.tasks = tasks == null ? List.of() : tasks.stream().map(Task::fromDbDto).toList();
+    instance.permissions =
+        dto.getPermissions() == null
+            ? new LinkedList<>()
+            : dto.getPermissions().stream().map(Permission::fromDbDto).toList();
+    instance.tasks =
+        tasks == null ? new LinkedList<>() : tasks.stream().map(Task::fromDbDto).toList();
     return instance;
   }
 }

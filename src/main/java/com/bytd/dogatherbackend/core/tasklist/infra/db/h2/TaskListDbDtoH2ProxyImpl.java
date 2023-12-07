@@ -1,8 +1,8 @@
 package com.bytd.dogatherbackend.core.tasklist.infra.db.h2;
 
+import com.bytd.dogatherbackend.core.tasklist.domain.dto.PermissionDbDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskDbDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskListDbDto;
-import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Participant;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -60,13 +60,16 @@ public class TaskListDbDtoH2ProxyImpl implements TaskListDbDto {
   }
 
   @Override
-  public void setParticipants(List<Participant> participants) {
-    taskListDbDtoH2.setParticipants(participants);
+  public void setPermissions(List<PermissionDbDto> participants) {
+    taskListDbDtoH2.setParticipants(
+        participants.stream().map(TaskListDbDtoH2ProxyImpl::toH2ParticipantImpl).toList());
   }
 
   @Override
-  public List<Participant> getParticipants() {
-    return taskListDbDtoH2.getParticipants();
+  public List<PermissionDbDto> getPermissions() {
+    return taskListDbDtoH2.getParticipants().stream()
+        .map(TaskListDbDtoH2ProxyImpl::hideParticipantDetails)
+        .toList();
   }
 
   @Override
@@ -86,6 +89,10 @@ public class TaskListDbDtoH2ProxyImpl implements TaskListDbDto {
     return task;
   }
 
+  private static PermissionDbDto hideParticipantDetails(PermissionDbDtoH2Impl participant) {
+    return participant;
+  }
+
   public TaskListDbDtoH2Impl toNativeImpl() {
     return taskListDbDtoH2;
   }
@@ -94,7 +101,17 @@ public class TaskListDbDtoH2ProxyImpl implements TaskListDbDto {
     if (task instanceof TaskDbDtoH2Impl taskDbDtoH2Impl) {
       return taskDbDtoH2Impl;
     } else {
-      throw new InvalidDbDtoException("TaskDbDtoH2Proxy.setTasks: task is not TaskDbDtoH2Proxy");
+      throw new InvalidDbDtoException(
+          "TaskListDbDtoH2Proxy.setTasks: task is not TaskDbDtoH2Proxy");
+    }
+  }
+
+  public static PermissionDbDtoH2Impl toH2ParticipantImpl(PermissionDbDto participantDbDto) {
+    if (participantDbDto instanceof PermissionDbDtoH2Impl participantDbDtoH2) {
+      return participantDbDtoH2;
+    } else {
+      throw new InvalidDbDtoException(
+          "TaskListDbDtoH2Proxy.setParticipants: participant is not ParticipantDbDtoH2Proxy");
     }
   }
 }
