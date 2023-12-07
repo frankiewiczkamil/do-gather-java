@@ -1,6 +1,7 @@
 package com.bytd.dogatherbackend.core.tasklist.infra.db.h2;
 
 import com.bytd.dogatherbackend.core.tasklist.domain.dto.PermissionDbDto;
+import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Role;
 import jakarta.persistence.*;
 import java.util.UUID;
 import lombok.Data;
@@ -11,9 +12,9 @@ import lombok.Data;
 public class PermissionDbDtoH2Impl implements PermissionDbDto {
   @Id private UUID id;
 
-  //    @Enumerated(EnumType.STRING)
+  @Enumerated(EnumType.STRING)
   @Column(name = "role")
-  private String role;
+  private Role role;
 
   @Column(name = "participant_id")
   private UUID participantId;

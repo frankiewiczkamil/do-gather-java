@@ -82,11 +82,11 @@ class TaskListServiceTest {
     var expectedTaskListDto = createTaskListDtoFromCreateCommand(createTaskListDto);
     var p1 = new PermissionDbDtoFakeImpl();
     p1.setParticipantId(createTaskListDto.creatorId());
-    p1.setRole(Role.OWNER.name());
+    p1.setRole(Role.OWNER);
     p1.setTaskListId(createTaskListDto.id());
     var p2 = new PermissionDbDtoFakeImpl();
     p2.setParticipantId(addParticipantDto.participantId());
-    p2.setRole(Role.EDITOR.name());
+    p2.setRole(Role.EDITOR);
     p2.setTaskListId(createTaskListDto.id());
     List<PermissionDbDto> expectedPermissions = new LinkedList<>();
     expectedPermissions.add(p1);
@@ -106,7 +106,7 @@ class TaskListServiceTest {
     expected.setCreatorId(createTaskListDto.creatorId());
     var permission = new PermissionDbDtoFakeImpl();
     permission.setParticipantId(createTaskListDto.creatorId());
-    permission.setRole(Role.OWNER.name());
+    permission.setRole(Role.OWNER);
     permission.setTaskListId(createTaskListDto.id());
     LinkedList<PermissionDbDto> permissions = new LinkedList<>();
     permissions.add(permission);

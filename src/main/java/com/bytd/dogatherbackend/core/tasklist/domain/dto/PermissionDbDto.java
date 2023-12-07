@@ -1,5 +1,6 @@
 package com.bytd.dogatherbackend.core.tasklist.domain.dto;
 
+import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Role;
 import java.util.UUID;
 
 public interface PermissionDbDto {
@@ -15,7 +16,7 @@ public interface PermissionDbDto {
 
   UUID getParticipantId();
 
-  void setRole(String role); // todo: change to Role
+  void setRole(Role role);
 
-  String getRole();
+  Role getRole();
 }

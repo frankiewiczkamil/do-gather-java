@@ -9,7 +9,7 @@ public record Permission(UUID participantId, Role role) {
   public PermissionDbDto toDbDto(Supplier<PermissionDbDto> dtoSupplier, UUID taskListId) {
     var dto = dtoSupplier.get();
     dto.setParticipantId(participantId);
-    dto.setRole(role.name());
+    dto.setRole(role);
 
     dto.setTaskListId(taskListId);
 
@@ -17,7 +17,6 @@ public record Permission(UUID participantId, Role role) {
   }
 
   public static Permission fromDbDto(PermissionDbDto dto) {
-    // todo
-    return new Permission(dto.getParticipantId(), Role.valueOf(dto.getRole()));
+    return new Permission(dto.getParticipantId(), dto.getRole());
   }
 }

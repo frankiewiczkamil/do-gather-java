@@ -104,7 +104,7 @@ class TaskListTest {
     var id = UUID.randomUUID();
     var expectedPermission = new PermissionDbDtoFakeImpl();
     expectedPermission.setParticipantId(id);
-    expectedPermission.setRole(Role.OWNER.name());
+    expectedPermission.setRole(Role.OWNER);
     expectedPermission.setTaskListId(taskListId);
 
     var addParticipantDto = new AddParticipantDto(id, List.of(Role.OWNER), creatorId, taskListId);
