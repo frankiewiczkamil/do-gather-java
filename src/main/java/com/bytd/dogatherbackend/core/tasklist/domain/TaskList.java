@@ -33,7 +33,11 @@ public class TaskList {
     instance.creatorId = dto.creatorId();
     instance.permissions = new LinkedList<>();
     instance.permissions.add(new Permission(dto.creatorId(), Role.OWNER));
-    instance.tasks = dto.tasks() == null ? List.of() : dto.tasks();
+
+    instance.tasks = new LinkedList<>();
+    if (dto.tasks() != null) {
+      dto.tasks().forEach(instance::addTask);
+    }
 
     return instance;
   }
