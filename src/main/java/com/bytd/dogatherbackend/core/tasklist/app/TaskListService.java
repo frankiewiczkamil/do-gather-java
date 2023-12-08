@@ -17,9 +17,11 @@ public class TaskListService {
   private Supplier<TaskListDbDto> taskListDbDtoSupplier;
   private Supplier<TaskDbDto> taskDbDtoSupplier;
   private Supplier<PermissionDbDto> permissionDbDtoSupplier;
+  private Supplier<UUID> taskListIdGenerator;
 
   public TaskListDbDto createTaskList(CreateTaskListDto dto) {
-    TaskList taskList = TaskList.create(dto.withId().withTasks());
+    TaskList taskList =
+        TaskList.create(dto.generateIdIfNotProvided(taskListIdGenerator).withTasks());
     var taskListDbDto = toTaskListDbDto(taskList);
 
     taskListDbDto

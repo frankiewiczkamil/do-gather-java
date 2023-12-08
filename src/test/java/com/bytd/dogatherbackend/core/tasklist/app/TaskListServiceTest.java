@@ -21,15 +21,33 @@ import org.junit.jupiter.api.Test;
 
 class TaskListServiceTest {
   private TaskListService taskListService;
+  final UUID taskListId = UUID.randomUUID();
 
   @BeforeEach
   void setUp() {
-    taskListService = TaskListServiceConfig.createTaskListServiceWithFakeRepo();
+    taskListService = TaskListServiceConfig.createTaskListServiceWithFakeRepo(() -> taskListId);
   }
 
   @Test
-  void itShouldCreateNewList() {
+  void itShouldCreateNewListWithIdFromPayload() {
     var createTaskListDto = generateCreateTaskListDto();
+    var expectedTaskList = createTaskListDtoFromCreateCommand(createTaskListDto);
+
+    var returnedList = taskListService.createTaskList(createTaskListDto);
+
+    expectedTaskList
+        .getPermissions()
+        .getLast()
+        .setId(returnedList.getPermissions().getLast().getId()); // tmp workaround for id
+
+    assertEquals(expectedTaskList, returnedList);
+    assertEquals(expectedTaskList, taskListService.getTaskList(createTaskListDto.id()).get());
+  }
+
+  @Test
+  void itShouldCreateNewListWithNewIdIfNotPresentInPayload() {
+    UUID customId = UUID.randomUUID();
+    var createTaskListDto = generateCreateTaskListDto(customId);
     var expectedTaskList = createTaskListDtoFromCreateCommand(createTaskListDto);
 
     var returnedList = taskListService.createTaskList(createTaskListDto);
@@ -115,12 +133,16 @@ class TaskListServiceTest {
     return expected;
   }
 
-  private CreateTaskListDto generateCreateTaskListDto() {
+  private CreateTaskListDto generateCreateTaskListDto(UUID taskListId) {
     return new CreateTaskListDto(
-        UUID.randomUUID(),
+        taskListId,
         "name_" + UUID.randomUUID(),
         "description_" + UUID.randomUUID(),
         UUID.randomUUID(),
         null);
+  }
+
+  private CreateTaskListDto generateCreateTaskListDto() {
+    return generateCreateTaskListDto(taskListId);
   }
 }
