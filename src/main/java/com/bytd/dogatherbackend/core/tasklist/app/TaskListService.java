@@ -18,10 +18,13 @@ public class TaskListService {
   private Supplier<TaskDbDto> taskDbDtoSupplier;
   private Supplier<PermissionDbDto> permissionDbDtoSupplier;
   private Supplier<UUID> taskListIdGenerator;
+  private Supplier<UUID> taskIdGenerator;
+  private Supplier<UUID> participantIdGenerator;
 
   public TaskListDbDto createTaskList(CreateTaskListDto dto) {
     TaskList taskList =
-        TaskList.create(dto.generateIdIfNotProvided(taskListIdGenerator).withTasks());
+        TaskList.create(
+            dto.generateIdIfNotProvided(taskListIdGenerator).withTasks(taskIdGenerator));
     var taskListDbDto = toTaskListDbDto(taskList);
 
     taskListDbDto
@@ -29,19 +32,19 @@ public class TaskListService {
         .forEach(
             participant -> {
               participant.setTaskListId(taskListDbDto.getId());
-              participant.setId(UUID.randomUUID());
+              participant.setId(participantIdGenerator.get());
             });
     taskListRepository.save(taskListDbDto);
     return taskListDbDto;
   }
 
   public void addTask(CreateTaskDto dto) {
-    Optional<? extends TaskListDbDto> taskListDbDto = taskListRepository.findById(dto.taskListId());
+    Optional<TaskListDbDto> taskListDbDto = taskListRepository.findById(dto.taskListId());
     if (taskListDbDto.isEmpty()) {
       throw new TaskListDoesNotExist(dto.taskListId());
     } else {
       TaskList taskList = TaskList.fromDbDto(taskListDbDto.get());
-      taskList.addTask(dto);
+      taskList.addTask(dto.withId(taskIdGenerator));
       taskListRepository.save(toTaskListDbDto(taskList));
     }
   }

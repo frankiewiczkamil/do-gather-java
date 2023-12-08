@@ -30,16 +30,22 @@ public class TaskListServiceConfig {
         TaskListDbDtoH2ProxyImpl::create,
         TaskDbDtoH2Impl::new,
         PermissionDbDtoH2Impl::new,
+        UUID::randomUUID,
+        UUID::randomUUID,
         UUID::randomUUID);
   }
 
   public static TaskListService createTaskListServiceWithFakeRepo(
-      Supplier<UUID> taskListIdGenerator) {
+      Supplier<UUID> taskListIdGenerator,
+      Supplier<UUID> taskIdGenerator,
+      Supplier<UUID> participantIdGenerator) {
     return new TaskListService(
         new TaskListFakeRepository(),
         TaskListDbDtoFakeImpl::new,
         TaskDbDtoFakeImpl::new,
         PermissionDbDtoFakeImpl::new,
-        taskListIdGenerator);
+        taskListIdGenerator,
+        taskIdGenerator,
+        participantIdGenerator);
   }
 }

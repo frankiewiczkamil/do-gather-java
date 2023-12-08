@@ -22,10 +22,14 @@ import org.junit.jupiter.api.Test;
 class TaskListServiceTest {
   private TaskListService taskListService;
   final UUID taskListId = UUID.randomUUID();
+  final UUID taskId = UUID.randomUUID();
+  final UUID participantId = UUID.randomUUID();
 
   @BeforeEach
   void setUp() {
-    taskListService = TaskListServiceConfig.createTaskListServiceWithFakeRepo(() -> taskListId);
+    taskListService =
+        TaskListServiceConfig.createTaskListServiceWithFakeRepo(
+            () -> taskListId, () -> taskId, () -> participantId);
   }
 
   @Test
@@ -35,10 +39,7 @@ class TaskListServiceTest {
 
     var returnedList = taskListService.createTaskList(createTaskListDto);
 
-    expectedTaskList
-        .getPermissions()
-        .getLast()
-        .setId(returnedList.getPermissions().getLast().getId()); // tmp workaround for id
+    expectedTaskList.getPermissions().getLast().setId(participantId);
 
     assertEquals(expectedTaskList, returnedList);
     assertEquals(expectedTaskList, taskListService.getTaskList(createTaskListDto.id()).get());
@@ -52,17 +53,14 @@ class TaskListServiceTest {
 
     var returnedList = taskListService.createTaskList(createTaskListDto);
 
-    expectedTaskList
-        .getPermissions()
-        .getLast()
-        .setId(returnedList.getPermissions().getLast().getId()); // tmp workaround for id
+    expectedTaskList.getPermissions().getLast().setId(participantId);
 
     assertEquals(expectedTaskList, returnedList);
     assertEquals(expectedTaskList, taskListService.getTaskList(createTaskListDto.id()).get());
   }
 
   @Test
-  void itShouldAddNewTaskToList() {
+  void itShouldAddNewTaskToListUsingProvidedId() {
     var createTaskListDto = generateCreateTaskListDto();
     taskListService.createTaskList(createTaskListDto);
     TaskListDbDto expectedTaskList = createTaskListDtoFromCreateCommand(createTaskListDto);
@@ -74,6 +72,30 @@ class TaskListServiceTest {
 
     TaskDbDtoFakeImpl expectedTask = new TaskDbDtoFakeImpl();
     expectedTask.setId(addTaskDto.id());
+    expectedTask.setName(addTaskDto.name());
+    expectedTask.setDescription(addTaskDto.description());
+    expectedTask.setTaskListId(createTaskListDto.id());
+    expectedTask.setState(TaskState.NEW);
+    expectedTask.setProgressTotal((short) 0);
+    expectedTask.setTimeSpent(0);
+
+    expectedTaskList.setTasks(List.of(expectedTask));
+
+    assertEquals(expectedTaskList, taskListService.getTaskList(createTaskListDto.id()).get());
+  }
+
+  @Test
+  void itShouldAddNewTaskToListWithNewIdIfNotPresentInPayload() {
+    var createTaskListDto = generateCreateTaskListDto();
+    taskListService.createTaskList(createTaskListDto);
+    TaskListDbDto expectedTaskList = createTaskListDtoFromCreateCommand(createTaskListDto);
+    var addTaskDto =
+        new CreateTaskDto(null, "task's name", "task's description", createTaskListDto.id());
+
+    taskListService.addTask(addTaskDto);
+
+    TaskDbDtoFakeImpl expectedTask = new TaskDbDtoFakeImpl();
+    expectedTask.setId(taskId);
     expectedTask.setName(addTaskDto.name());
     expectedTask.setDescription(addTaskDto.description());
     expectedTask.setTaskListId(createTaskListDto.id());

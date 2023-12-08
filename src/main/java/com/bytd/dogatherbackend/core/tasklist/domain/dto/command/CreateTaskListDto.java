@@ -14,9 +14,11 @@ public record CreateTaskListDto(
     }
   }
 
-  public CreateTaskListDto withTasks() {
+  public CreateTaskListDto withTasks(Supplier<UUID> taskIdGenerator) {
     List<CreateTaskDto> taskz =
-        tasks == null ? List.of() : tasks.stream().map(CreateTaskDto::withId).toList();
+        tasks == null
+            ? List.of()
+            : tasks.stream().map(createTaskDto -> createTaskDto.withId(taskIdGenerator)).toList();
     return new CreateTaskListDto(id, name, description, creatorId, taskz);
   }
 }
