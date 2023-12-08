@@ -13,8 +13,10 @@ import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.GuestNotAll
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.ParticipantAlreadyAdded;
 import com.bytd.dogatherbackend.core.tasklist.exceptions.participant.ParticipantRoleTooLowToAddAnotherParticipant;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TaskList {
 
@@ -46,10 +48,12 @@ public class TaskList {
     if (tasks.stream().anyMatch(t -> t.isIdConflict(taskDto.id()))) {
       throw new IllegalArgumentException("Task already exists in the list");
     } else {
-      Task task = Task.create(taskDto);
-      tasks = new LinkedList<>(tasks);
-      tasks.add(task);
+      addTask(Task.create(taskDto));
     }
+  }
+
+  private void addTask(Task task) {
+    tasks = Stream.concat(tasks.stream(), Stream.of(task)).toList();
   }
 
   public void addParticipant(AddParticipantDto dto) {
@@ -68,10 +72,17 @@ public class TaskList {
               .map(Role::toString)
               .collect(Collectors.joining(", ")));
     } else {
-      this.permissions = new LinkedList<>(this.permissions);
-      this.permissions.addAll(
-          dto.roles().stream().map(role -> new Permission(dto.participantId(), role)).toList());
+      Function<Role, Permission> roleToPermission = roleToPermissionFactory(dto.participantId());
+      addPermissions(dto.roles().stream().map(roleToPermission));
     }
+  }
+
+  private Function<Role, Permission> roleToPermissionFactory(UUID participantId) {
+    return role -> new Permission(participantId, role);
+  }
+
+  private void addPermissions(Stream<Permission> newPermissions) {
+    permissions = Stream.concat(this.permissions.stream(), newPermissions).toList();
   }
 
   private boolean isRoleToBeAddedHigherThanAuthorRole(AddParticipantDto dto) {
