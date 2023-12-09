@@ -4,7 +4,7 @@ import com.bytd.dogatherbackend.core.tasklist.domain.dto.PermissionDbDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Role;
 import java.util.UUID;
 
-public record PermissionResponseDto(UUID id, Role role, UUID participantId) {
+record PermissionResponseDto(UUID id, Role role, UUID participantId) {
 
   public static PermissionResponseDto from(PermissionDbDto permission) {
     UUID id = permission.getId();
