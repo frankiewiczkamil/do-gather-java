@@ -9,9 +9,9 @@ public record TaskListResponseDto(
 
   public static TaskListResponseDto from(TaskListDbDto taskList) {
     return new TaskListResponseDto(
-        taskList.getId(),
-        taskList.getName(),
-        taskList.getPermissions().stream().map(PermissionResponseDto::from).toList(),
-        taskList.getTasks().stream().map(TaskResponseDto::from).toList());
+        taskList.id(),
+        taskList.name(),
+        taskList.permissions().stream().map(PermissionResponseDto::from).toList(),
+        taskList.tasks().stream().map(TaskResponseDto::from).toList());
   }
 }

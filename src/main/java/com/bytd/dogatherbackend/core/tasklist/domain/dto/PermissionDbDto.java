@@ -4,19 +4,19 @@ import com.bytd.dogatherbackend.core.tasklist.domain.model.participant.Role;
 import java.util.UUID;
 
 public interface PermissionDbDto {
-  void setId(UUID id);
+  void id(UUID id);
 
-  UUID getId();
+  UUID id();
 
-  void setTaskListId(UUID taskListId);
+  void taskListId(UUID taskListId);
 
-  UUID getTaskListId();
+  UUID taskListId();
 
-  void setParticipantId(UUID participantId);
+  void participantId(UUID participantId);
 
-  UUID getParticipantId();
+  UUID participantId();
 
-  void setRole(Role role);
+  void role(Role role);
 
-  Role getRole();
+  Role role();
 }

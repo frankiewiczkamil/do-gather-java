@@ -34,13 +34,13 @@ public class Task {
 
   public static Task fromDbDto(TaskDbDto dto) {
     var instance = new Task();
-    instance.id = dto.getId();
-    instance.name = dto.getName();
-    instance.description = dto.getDescription();
-    instance.taskListId = dto.getTaskListId();
-    instance.state = dto.getState();
-    instance.progressTotal = dto.getProgressTotal();
-    instance.timeSpent = dto.getTimeSpent();
+    instance.id = dto.id();
+    instance.name = dto.name();
+    instance.description = dto.description();
+    instance.taskListId = dto.taskListId();
+    instance.state = dto.state();
+    instance.progressTotal = dto.progressTotal();
+    instance.timeSpent = dto.timeSpent();
     return instance;
   }
 
@@ -50,18 +50,13 @@ public class Task {
 
   public TaskDbDto toDbDto(Supplier<TaskDbDto> dtoSupplier) {
     var dto = dtoSupplier.get();
-    dto.setId(id);
-    dto.setState(state);
-    dto.setProgressTotal(progressTotal);
-    dto.setTimeSpent(timeSpent);
-    dto.setName(name);
-    dto.setDescription(description);
-    dto.setTaskListId(taskListId);
+    dto.id(id);
+    dto.state(state);
+    dto.progressTotal(progressTotal);
+    dto.timeSpent(timeSpent);
+    dto.name(name);
+    dto.description(description);
+    dto.taskListId(taskListId);
     return dto;
-  }
-
-  public Task withId() {
-    if (this.id == null) this.id = UUID.randomUUID();
-    return this;
   }
 }

@@ -36,9 +36,9 @@ class TaskListTest {
     var taskListDbDto =
         taskList.toDbDto(
             TaskListDbDtoFakeImpl::new, TaskDbDtoFakeImpl::new, PermissionDbDtoFakeImpl::new);
-    assertEquals(taskListId, taskListDbDto.getId());
-    assertEquals("name", taskListDbDto.getName());
-    assertEquals("description", taskListDbDto.getDescription());
+    assertEquals(taskListId, taskListDbDto.id());
+    assertEquals("name", taskListDbDto.name());
+    assertEquals("description", taskListDbDto.description());
   }
 
   @Test
@@ -64,12 +64,12 @@ class TaskListTest {
         taskList.toDbDto(
             TaskListDbDtoFakeImpl::new, TaskDbDtoFakeImpl::new, PermissionDbDtoFakeImpl::new);
 
-    assertEquals(2, taskListDbDto.getTasks().size());
+    assertEquals(2, taskListDbDto.tasks().size());
 
-    var taskDbDto1 = taskListDbDto.getTasks().get(0);
-    var taskDbDto2 = taskListDbDto.getTasks().get(1);
+    var taskDbDto1 = taskListDbDto.tasks().get(0);
+    var taskDbDto2 = taskListDbDto.tasks().get(1);
 
-    assertThat(taskListDbDto.getTasks()).isEqualTo(List.of(taskDbDto1, taskDbDto2));
+    assertThat(taskListDbDto.tasks()).isEqualTo(List.of(taskDbDto1, taskDbDto2));
   }
 
   @Test
@@ -103,9 +103,9 @@ class TaskListTest {
     var taskList = TaskList.create(createTaskListDto);
     var id = UUID.randomUUID();
     var expectedPermission = new PermissionDbDtoFakeImpl();
-    expectedPermission.setParticipantId(id);
-    expectedPermission.setRole(Role.OWNER);
-    expectedPermission.setTaskListId(taskListId);
+    expectedPermission.participantId(id);
+    expectedPermission.role(Role.OWNER);
+    expectedPermission.taskListId(taskListId);
 
     var addParticipantDto = new AddParticipantDto(id, List.of(Role.OWNER), creatorId, taskListId);
 
@@ -114,8 +114,8 @@ class TaskListTest {
     var taskListDbDto =
         taskList.toDbDto(
             TaskListDbDtoFakeImpl::new, TaskDbDtoFakeImpl::new, PermissionDbDtoFakeImpl::new);
-    assertEquals(2, taskListDbDto.getPermissions().size());
-    assertEquals(expectedPermission, taskListDbDto.getPermissions().get(1));
+    assertEquals(2, taskListDbDto.permissions().size());
+    assertEquals(expectedPermission, taskListDbDto.permissions().get(1));
   }
 
   @Test

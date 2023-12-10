@@ -16,7 +16,7 @@ public class TaskListFakeRepository implements TaskListRepository {
   }
 
   public TaskListDbDto save(TaskListDbDto taskList) {
-    taskLists.put(taskList.getId(), taskList);
+    taskLists.put(taskList.id(), taskList);
     return taskList;
   }
 }

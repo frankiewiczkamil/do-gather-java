@@ -9,11 +9,11 @@ record TaskResponseDto(
 
   public static TaskResponseDto from(TaskDbDto task) {
     return new TaskResponseDto(
-        task.getId(),
-        task.getState(),
-        task.getProgressTotal(),
-        task.getTimeSpent(),
-        task.getName(),
-        task.getDescription());
+        task.id(),
+        task.state(),
+        task.progressTotal(),
+        task.timeSpent(),
+        task.name(),
+        task.description());
   }
 }

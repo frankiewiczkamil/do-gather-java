@@ -6,9 +6,7 @@ import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.PermissionDbDtoFakeI
 import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.TaskDbDtoFakeImpl;
 import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.TaskListDbDtoFakeImpl;
 import com.bytd.dogatherbackend.core.tasklist.infra.db.fake.TaskListFakeRepository;
-import com.bytd.dogatherbackend.core.tasklist.infra.db.h2.PermissionDbDtoH2Impl;
-import com.bytd.dogatherbackend.core.tasklist.infra.db.h2.TaskDbDtoH2Impl;
-import com.bytd.dogatherbackend.core.tasklist.infra.db.h2.TaskListDbDtoH2ProxyImpl;
+import com.bytd.dogatherbackend.core.tasklist.infra.db.h2.*;
 import java.util.UUID;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
@@ -28,8 +26,8 @@ public class TaskListServiceConfig {
     return new TaskListService(
         taskListH2ProxyRepository,
         TaskListDbDtoH2ProxyImpl::create,
-        TaskDbDtoH2Impl::new,
-        PermissionDbDtoH2Impl::new,
+        TaskDbDtoH2ProxyImpl::create,
+        PermissionDbDtoH2ProxyImpl::create,
         UUID::randomUUID,
         UUID::randomUUID,
         UUID::randomUUID);

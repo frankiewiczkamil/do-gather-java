@@ -4,31 +4,31 @@ import com.bytd.dogatherbackend.core.tasklist.domain.model.task.TaskState;
 import java.util.UUID;
 
 public interface TaskDbDto {
-  void setId(UUID id);
+  void id(UUID id);
 
-  UUID getId();
+  UUID id();
 
-  void setState(TaskState state);
+  void state(TaskState state);
 
-  TaskState getState();
+  TaskState state();
 
-  void setProgressTotal(short progressTotal);
+  void progressTotal(short progressTotal);
 
-  short getProgressTotal();
+  short progressTotal();
 
-  void setTimeSpent(int timeSpent);
+  void timeSpent(int timeSpent);
 
-  int getTimeSpent();
+  int timeSpent();
 
-  void setName(String name);
+  void name(String name);
 
-  String getName();
+  String name();
 
-  void setDescription(String description);
+  void description(String description);
 
-  String getDescription();
+  String description();
 
-  void setTaskListId(UUID taskListId);
+  void taskListId(UUID taskListId);
 
-  UUID getTaskListId();
+  UUID taskListId();
 }

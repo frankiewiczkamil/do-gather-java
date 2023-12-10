@@ -20,77 +20,77 @@ public class TaskListDbDtoH2ProxyImpl implements TaskListDbDto {
   }
 
   @Override
-  public void setId(UUID id) {
+  public void id(UUID id) {
     taskListDbDtoH2.setId(id);
   }
 
   @Override
-  public UUID getId() {
+  public UUID id() {
     return taskListDbDtoH2.getId();
   }
 
   @Override
-  public void setName(String name) {
+  public void name(String name) {
     taskListDbDtoH2.setName(name);
   }
 
   @Override
-  public String getName() {
+  public String name() {
     return taskListDbDtoH2.getName();
   }
 
   @Override
-  public void setDescription(String description) {
+  public void description(String description) {
     taskListDbDtoH2.setDescription(description);
   }
 
   @Override
-  public String getDescription() {
+  public String description() {
     return taskListDbDtoH2.getDescription();
   }
 
   @Override
-  public void setCreatorId(UUID creatorId) {
+  public void creatorId(UUID creatorId) {
     taskListDbDtoH2.setCreatorId(creatorId);
   }
 
   @Override
-  public UUID getCreatorId() {
+  public UUID creatorId() {
     return taskListDbDtoH2.getCreatorId();
   }
 
   @Override
-  public void setPermissions(List<PermissionDbDto> participants) {
-    taskListDbDtoH2.setParticipants(
-        participants.stream().map(TaskListDbDtoH2ProxyImpl::toH2ParticipantImpl).toList());
+  public void permissions(List<PermissionDbDto> participants) {
+    List<PermissionDbDtoH2Impl> permissionsH2Dto =
+        participants.stream().map(TaskListDbDtoH2ProxyImpl::toH2ParticipantImpl).toList();
+    taskListDbDtoH2.setParticipants(permissionsH2Dto);
   }
 
   @Override
-  public List<PermissionDbDto> getPermissions() {
+  public List<PermissionDbDto> permissions() {
     return taskListDbDtoH2.getParticipants().stream()
-        .map(TaskListDbDtoH2ProxyImpl::hideParticipantDetails)
+        .map(TaskListDbDtoH2ProxyImpl::toPermissionDbDto)
         .toList();
   }
 
   @Override
-  public void setTasks(List<TaskDbDto> tasks) {
-    var taskz = tasks.stream().map(TaskListDbDtoH2ProxyImpl::toH2TaskImpl).toList();
-    taskListDbDtoH2.setTasks(taskz);
+  public void tasks(List<TaskDbDto> tasks) {
+    List<TaskDbDtoH2Impl> tasksH2Dto =
+        tasks.stream().map(TaskListDbDtoH2ProxyImpl::toH2TaskImpl).toList();
+    taskListDbDtoH2.setTasks(tasksH2Dto);
   }
 
   @Override
-  public List<TaskDbDto> getTasks() {
-    return taskListDbDtoH2.getTasks().stream()
-        .map(TaskListDbDtoH2ProxyImpl::hideTaskDetails)
-        .toList();
+  public List<TaskDbDto> tasks() {
+    return taskListDbDtoH2.getTasks().stream().map(TaskListDbDtoH2ProxyImpl::toTaskDbDto).toList();
   }
 
-  private static TaskDbDto hideTaskDetails(TaskDbDtoH2Impl task) {
-    return task;
+  private static TaskDbDto toTaskDbDto(TaskDbDtoH2Impl task) {
+    return TaskDbDtoH2ProxyImpl.from(task);
   }
 
-  private static PermissionDbDto hideParticipantDetails(PermissionDbDtoH2Impl participant) {
-    return participant;
+  private static PermissionDbDto toPermissionDbDto(PermissionDbDtoH2Impl participant) {
+    return PermissionDbDtoH2ProxyImpl.from(participant);
   }
 
   public TaskListDbDtoH2Impl toNativeImpl() {
@@ -98,8 +98,8 @@ public class TaskListDbDtoH2ProxyImpl implements TaskListDbDto {
   }
 
   public static TaskDbDtoH2Impl toH2TaskImpl(TaskDbDto task) {
-    if (task instanceof TaskDbDtoH2Impl taskDbDtoH2Impl) {
-      return taskDbDtoH2Impl;
+    if (task instanceof TaskDbDtoH2ProxyImpl taskDbDtoH2Proxy) {
+      return taskDbDtoH2Proxy.toNativeImpl();
     } else {
       throw new InvalidDbDtoException(
           "TaskListDbDtoH2Proxy.setTasks: task is not TaskDbDtoH2Proxy");
@@ -107,8 +107,8 @@ public class TaskListDbDtoH2ProxyImpl implements TaskListDbDto {
   }
 
   public static PermissionDbDtoH2Impl toH2ParticipantImpl(PermissionDbDto participantDbDto) {
-    if (participantDbDto instanceof PermissionDbDtoH2Impl participantDbDtoH2) {
-      return participantDbDtoH2;
+    if (participantDbDto instanceof PermissionDbDtoH2ProxyImpl participantDbDtoH2Proxy) {
+      return participantDbDtoH2Proxy.toNativeImpl();
     } else {
       throw new InvalidDbDtoException(
           "TaskListDbDtoH2Proxy.setParticipants: participant is not ParticipantDbDtoH2Proxy");

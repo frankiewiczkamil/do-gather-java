@@ -6,7 +6,9 @@ import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskListDbDto;
 import java.util.List;
 import java.util.UUID;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
+@Accessors(fluent = true, chain = false)
 @Data
 public class TaskListDbDtoFakeImpl implements TaskListDbDto {
   private UUID id;

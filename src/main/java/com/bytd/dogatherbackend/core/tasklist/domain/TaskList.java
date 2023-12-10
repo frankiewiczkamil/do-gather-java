@@ -105,27 +105,26 @@ public class TaskList {
       Supplier<TaskDbDto> taskDbDtoSupplier,
       Supplier<PermissionDbDto> permissionDbDtoSupplier) {
     TaskListDbDto dto = listDbDtoSupplier.get();
-    dto.setId(id);
-    dto.setName(name);
-    dto.setDescription(description);
-    dto.setCreatorId(creatorId);
-    dto.setPermissions(
-        permissions.stream().map(p -> p.toDbDto(permissionDbDtoSupplier, id)).toList());
-    dto.setTasks(tasks.stream().map(task -> task.toDbDto(taskDbDtoSupplier)).toList());
+    dto.id(id);
+    dto.name(name);
+    dto.description(description);
+    dto.creatorId(creatorId);
+    dto.permissions(permissions.stream().map(p -> p.toDbDto(permissionDbDtoSupplier, id)).toList());
+    dto.tasks(tasks.stream().map(task -> task.toDbDto(taskDbDtoSupplier)).toList());
     return dto;
   }
 
   public static TaskList fromDbDto(TaskListDbDto dto) {
-    List<TaskDbDto> tasks = dto.getTasks();
+    List<TaskDbDto> tasks = dto.tasks();
     var instance = new TaskList();
-    instance.id = dto.getId();
-    instance.name = dto.getName();
-    instance.description = dto.getDescription();
-    instance.creatorId = dto.getCreatorId();
+    instance.id = dto.id();
+    instance.name = dto.name();
+    instance.description = dto.description();
+    instance.creatorId = dto.creatorId();
     instance.permissions =
-        dto.getPermissions() == null
+        dto.permissions() == null
             ? new LinkedList<>()
-            : dto.getPermissions().stream().map(Permission::fromDbDto).toList();
+            : dto.permissions().stream().map(Permission::fromDbDto).toList();
     instance.tasks =
         tasks == null ? new LinkedList<>() : tasks.stream().map(Task::fromDbDto).toList();
     return instance;

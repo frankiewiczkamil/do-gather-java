@@ -4,27 +4,27 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TaskListDbDto {
-  void setId(UUID id);
+  void id(UUID id);
 
-  UUID getId();
+  UUID id();
 
-  void setName(String name);
+  void name(String name);
 
-  String getName();
+  String name();
 
-  void setDescription(String description);
+  void description(String description);
 
-  String getDescription();
+  String description();
 
-  void setCreatorId(UUID creatorId);
+  void creatorId(UUID creatorId);
 
-  UUID getCreatorId();
+  UUID creatorId();
 
-  void setPermissions(List<PermissionDbDto> participants);
+  void permissions(List<PermissionDbDto> participants);
 
-  List<PermissionDbDto> getPermissions();
+  List<PermissionDbDto> permissions();
 
-  void setTasks(List<TaskDbDto> tasks);
+  void tasks(List<TaskDbDto> tasks);
 
-  List<TaskDbDto> getTasks();
+  List<TaskDbDto> tasks();
 }

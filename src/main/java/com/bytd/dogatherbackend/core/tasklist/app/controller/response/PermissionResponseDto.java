@@ -7,9 +7,9 @@ import java.util.UUID;
 record PermissionResponseDto(UUID id, Role role, UUID participantId) {
 
   public static PermissionResponseDto from(PermissionDbDto permission) {
-    UUID id = permission.getId();
-    Role role = permission.getRole();
-    UUID participantId = permission.getParticipantId();
+    UUID id = permission.id();
+    Role role = permission.role();
+    UUID participantId = permission.participantId();
     return new PermissionResponseDto(id, role, participantId);
   }
 }

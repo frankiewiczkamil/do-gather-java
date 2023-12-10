@@ -22,6 +22,6 @@ class TaskTest {
     var dto = new CreateTaskDto(UUID.randomUUID(), "name", "description", UUID.randomUUID());
     var task = Task.create(dto);
     var taskDbDto = task.toDbDto(() -> new TaskDbDtoFakeImpl() {});
-    assertEquals(dto.id(), taskDbDto.getId());
+    assertEquals(dto.id(), taskDbDto.id());
   }
 }

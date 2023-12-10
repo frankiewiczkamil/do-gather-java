@@ -1,6 +1,5 @@
 package com.bytd.dogatherbackend.core.tasklist.infra.db.h2;
 
-import com.bytd.dogatherbackend.core.tasklist.domain.dto.TaskDbDto;
 import com.bytd.dogatherbackend.core.tasklist.domain.model.task.TaskState;
 import jakarta.persistence.*;
 import java.util.UUID;
@@ -9,7 +8,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "task")
-public class TaskDbDtoH2Impl implements TaskDbDto {
+public class TaskDbDtoH2Impl {
   @Id private UUID id;
 
   @Enumerated(EnumType.STRING)

@@ -39,7 +39,7 @@ class TaskListServiceTest {
 
     var returnedList = taskListService.createTaskList(createTaskListDto);
 
-    expectedTaskList.getPermissions().getLast().setId(participantId);
+    expectedTaskList.permissions().getLast().id(participantId);
 
     assertEquals(expectedTaskList, returnedList);
     assertEquals(expectedTaskList, taskListService.getTaskList(createTaskListDto.id()).get());
@@ -53,7 +53,7 @@ class TaskListServiceTest {
 
     var returnedList = taskListService.createTaskList(createTaskListDto);
 
-    expectedTaskList.getPermissions().getLast().setId(participantId);
+    expectedTaskList.permissions().getLast().id(participantId);
 
     assertEquals(expectedTaskList, returnedList);
     assertEquals(expectedTaskList, taskListService.getTaskList(createTaskListDto.id()).get());
@@ -71,15 +71,15 @@ class TaskListServiceTest {
     taskListService.addTask(addTaskDto);
 
     TaskDbDtoFakeImpl expectedTask = new TaskDbDtoFakeImpl();
-    expectedTask.setId(addTaskDto.id());
-    expectedTask.setName(addTaskDto.name());
-    expectedTask.setDescription(addTaskDto.description());
-    expectedTask.setTaskListId(createTaskListDto.id());
-    expectedTask.setState(TaskState.NEW);
-    expectedTask.setProgressTotal((short) 0);
-    expectedTask.setTimeSpent(0);
+    expectedTask.id(addTaskDto.id());
+    expectedTask.name(addTaskDto.name());
+    expectedTask.description(addTaskDto.description());
+    expectedTask.taskListId(createTaskListDto.id());
+    expectedTask.state(TaskState.NEW);
+    expectedTask.progressTotal((short) 0);
+    expectedTask.timeSpent(0);
 
-    expectedTaskList.setTasks(List.of(expectedTask));
+    expectedTaskList.tasks(List.of(expectedTask));
 
     assertEquals(expectedTaskList, taskListService.getTaskList(createTaskListDto.id()).get());
   }
@@ -95,15 +95,15 @@ class TaskListServiceTest {
     taskListService.addTask(addTaskDto);
 
     TaskDbDtoFakeImpl expectedTask = new TaskDbDtoFakeImpl();
-    expectedTask.setId(taskId);
-    expectedTask.setName(addTaskDto.name());
-    expectedTask.setDescription(addTaskDto.description());
-    expectedTask.setTaskListId(createTaskListDto.id());
-    expectedTask.setState(TaskState.NEW);
-    expectedTask.setProgressTotal((short) 0);
-    expectedTask.setTimeSpent(0);
+    expectedTask.id(taskId);
+    expectedTask.name(addTaskDto.name());
+    expectedTask.description(addTaskDto.description());
+    expectedTask.taskListId(createTaskListDto.id());
+    expectedTask.state(TaskState.NEW);
+    expectedTask.progressTotal((short) 0);
+    expectedTask.timeSpent(0);
 
-    expectedTaskList.setTasks(List.of(expectedTask));
+    expectedTaskList.tasks(List.of(expectedTask));
 
     assertEquals(expectedTaskList, taskListService.getTaskList(createTaskListDto.id()).get());
   }
@@ -121,17 +121,17 @@ class TaskListServiceTest {
             createTaskListDto.id());
     var expectedTaskListDto = createTaskListDtoFromCreateCommand(createTaskListDto);
     var p1 = new PermissionDbDtoFakeImpl();
-    p1.setParticipantId(createTaskListDto.creatorId());
-    p1.setRole(Role.OWNER);
-    p1.setTaskListId(createTaskListDto.id());
+    p1.participantId(createTaskListDto.creatorId());
+    p1.role(Role.OWNER);
+    p1.taskListId(createTaskListDto.id());
     var p2 = new PermissionDbDtoFakeImpl();
-    p2.setParticipantId(addParticipantDto.participantId());
-    p2.setRole(Role.EDITOR);
-    p2.setTaskListId(createTaskListDto.id());
+    p2.participantId(addParticipantDto.participantId());
+    p2.role(Role.EDITOR);
+    p2.taskListId(createTaskListDto.id());
     List<PermissionDbDto> expectedPermissions = new LinkedList<>();
     expectedPermissions.add(p1);
     expectedPermissions.add(p2);
-    expectedTaskListDto.setPermissions(expectedPermissions);
+    expectedTaskListDto.permissions(expectedPermissions);
 
     taskListService.addParticipant(addParticipantDto);
 
@@ -140,18 +140,18 @@ class TaskListServiceTest {
 
   private TaskListDbDto createTaskListDtoFromCreateCommand(CreateTaskListDto createTaskListDto) {
     var expected = new TaskListDbDtoFakeImpl();
-    expected.setId(createTaskListDto.id());
-    expected.setName(createTaskListDto.name());
-    expected.setDescription(createTaskListDto.description());
-    expected.setCreatorId(createTaskListDto.creatorId());
+    expected.id(createTaskListDto.id());
+    expected.name(createTaskListDto.name());
+    expected.description(createTaskListDto.description());
+    expected.creatorId(createTaskListDto.creatorId());
     var permission = new PermissionDbDtoFakeImpl();
-    permission.setParticipantId(createTaskListDto.creatorId());
-    permission.setRole(Role.OWNER);
-    permission.setTaskListId(createTaskListDto.id());
+    permission.participantId(createTaskListDto.creatorId());
+    permission.role(Role.OWNER);
+    permission.taskListId(createTaskListDto.id());
     LinkedList<PermissionDbDto> permissions = new LinkedList<>();
     permissions.add(permission);
-    expected.setPermissions(permissions);
-    expected.setTasks(List.of());
+    expected.permissions(permissions);
+    expected.tasks(List.of());
     return expected;
   }
 

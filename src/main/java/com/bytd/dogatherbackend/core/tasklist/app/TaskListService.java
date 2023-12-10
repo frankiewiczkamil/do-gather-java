@@ -19,7 +19,7 @@ public class TaskListService {
   private Supplier<PermissionDbDto> permissionDbDtoSupplier;
   private Supplier<UUID> taskListIdGenerator;
   private Supplier<UUID> taskIdGenerator;
-  private Supplier<UUID> participantIdGenerator;
+  private Supplier<UUID> permissionIdGenerator;
 
   public TaskListDbDto createTaskList(CreateTaskListDto dto) {
     TaskList taskList =
@@ -28,11 +28,11 @@ public class TaskListService {
     var taskListDbDto = toTaskListDbDto(taskList);
 
     taskListDbDto
-        .getPermissions()
+        .permissions()
         .forEach(
-            participant -> {
-              participant.setTaskListId(taskListDbDto.getId());
-              participant.setId(participantIdGenerator.get());
+            permission -> {
+              permission.taskListId(taskListDbDto.id());
+              permission.id(permissionIdGenerator.get());
             });
     taskListRepository.save(taskListDbDto);
     return taskListDbDto;
