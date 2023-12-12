@@ -1,24 +1,46 @@
 package com.bytd.dogatherbackend.core.users;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import org.springframework.stereotype.Service;
+import java.util.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-@Service
-public class UsersService {
-  Map<String, User> users = new HashMap<>();
+@RequiredArgsConstructor
+public class UsersService implements UserDetailsService {
+  private BCryptPasswordEncoder passwordEncoder;
+  private UsersRepository usersRepo = new UsersRepository();
 
-  public void signUp(String username, String password, String email) {
-    users.put(email, new User(UUID.randomUUID(), email, username, password));
+  UsersService(BCryptPasswordEncoder passwordEncoder) {
+    this.passwordEncoder = passwordEncoder;
   }
 
-  public boolean authenticate(String email, String password) {
-    var user = users.get(email);
+  public void signUp(String username, String password, String email) {
+    usersRepo.save(new User(UUID.randomUUID(), email, username, passwordEncoder.encode(password)));
+  }
+
+  @Override
+  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    var user = usersRepo.findByEmail(email);
     if (user == null) {
-      return false;
+      throw new UsernameNotFoundException(email);
     } else {
-      return user.password().equals(password);
+      return new org.springframework.security.core.userdetails.User(
+          user.email(), user.password(), List.of(new SimpleGrantedAuthority("USER")));
+    }
+  }
+
+  class UsersRepository {
+    private Map<String, User> users = new HashMap<>();
+
+    public void save(User user) {
+      users.put(user.email(), user);
+    }
+
+    public User findByEmail(String email) {
+      return users.get(email);
     }
   }
 }
