@@ -21,6 +21,8 @@
     echo hello from $GREET
   '';
 
+  languages.java.enable = true;
+
   enterShell = ''
     hello
     git --version
